@@ -1,1 +1,6 @@
-console.log("Hola mundo");
+import { Router } from "express";
+import Server from "./src/server/config.js";
+
+const server = new Server();
+
+server.listen();
