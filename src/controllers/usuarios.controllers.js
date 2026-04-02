@@ -1,4 +1,7 @@
+import { basename } from "node:path";
 import { prisma } from "../server/prisma.js";
+import bcrypt from "bcrypt";
+import generarJWT from "../middlewares/generarJWT.js";
 
 export const crearUsuario = async (req, res) => {
   try {
@@ -68,5 +71,41 @@ export const cambiarEstadoUsuario = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al cambiar el estado del usuario" });
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    //verificar email
+    const usuarioBuscado = prisma.usuario.findUnique({
+      where: { email },
+    });
+
+    //verificamos que el correo exista
+    if (!usuarioBuscado) {
+      return res.status(404).json({ mensaje: "Usuario no existe" });
+    }
+
+    //verificar si la contraseña es correcta
+    const passwordValido = bcrypt.compareSync(
+      password,
+      usuarioBuscado.password,
+    );
+    if (!passwordValido) {
+      return res.status(401).json({ mensaje: "Contraseña incorrecta" });
+    }
+
+    //generacion del token
+    const token = generarJWT(usuarioBuscado.idUsuario, usuarioBuscado.email);
+    res.status(200).json({
+      mensaje: "Inicio de sesion exitoso",
+      usuario: usuarioBuscado.nombreCompleto,
+      token,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al iniciar sesion" });
   }
 };
