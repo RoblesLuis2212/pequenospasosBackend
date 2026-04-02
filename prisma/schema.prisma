@@ -83,12 +83,18 @@ model MetodoPago {
   ventas       Ventas[]
 }
 
+enum EstadoUsuario {
+  ACTIVO
+  INACTIVO
+}
+
 model Usuario {
-  idUsuario      Int        @id @default(autoincrement())
+  idUsuario      Int           @id @default(autoincrement())
   nombreCompleto String
   telefono       String
-  email          String     @unique
+  email          String        @unique
   password       String
+  estado         EstadoUsuario @default(ACTIVO)
   pacientes      Paciente[]
 
   rolId         Int
