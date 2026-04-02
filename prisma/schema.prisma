@@ -1,0 +1,268 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EstadoProducto {
+  DISPONIBLE
+  INACTIVO
+}
+
+model Producto {
+  idProducto               Int            @id @default(autoincrement())
+  nombre                   String
+  precio                   Decimal
+  stock                    Int
+  fechaCreacion            DateTime       @default(now())
+  imagen                   String
+  fechaUltimaActualizacion DateTime       @updatedAt
+  codigoBarras             String         @unique
+  estado                   EstadoProducto @default(DISPONIBLE)
+
+  categoriaId Int?
+  categoria   Categoria? @relation(fields: [categoriaId], references: [idCategoria])
+
+  detalles        DetalleVenta[]
+  detalleCarritos DetalleCarrito[]
+}
+
+model Categoria {
+  idCategoria Int        @id @default(autoincrement())
+  nombre      String     @unique
+  productos   Producto[]
+}
+
+enum EstadoVenta {
+  PENDIENTE
+  PAGADO
+  CANCELADO
+}
+
+model Ventas {
+  idVenta     Int         @id @default(autoincrement())
+  fechaCompra DateTime    @default(now())
+  monto       Decimal
+  descripcion String?
+  estado      EstadoVenta @default(PENDIENTE)
+
+  metodoPagoId Int
+  metodopago   MetodoPago @relation(fields: [metodoPagoId], references: [idMetodoPago])
+
+  cajaId Int
+  caja   Caja @relation(fields: [cajaId], references: [idCaja])
+
+  detalles DetalleVenta[]
+}
+
+model DetalleVenta {
+  idDetalleVenta  Int     @id @default(autoincrement())
+  cantidad        Int
+  precio_unitario Decimal
+
+  ventaId Int
+  venta   Ventas @relation(fields: [ventaId], references: [idVenta])
+
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [idProducto])
+}
+
+enum NombreMetodoPago {
+  TRANSFERENCIA
+  DEBITO
+  CREDITO
+  EFECTIVO
+}
+
+model MetodoPago {
+  idMetodoPago Int              @id @default(autoincrement())
+  nombre       NombreMetodoPago @unique
+  ventas       Ventas[]
+}
+
+model Usuario {
+  idUsuario      Int        @id @default(autoincrement())
+  nombreCompleto String
+  telefono       String
+  email          String     @unique
+  password       String
+  pacientes      Paciente[]
+
+  rolId         Int
+  rol           RolUsuario     @relation(fields: [rolId], references: [idRol])
+  turnos        Turno[]
+  tokenUsuarios TokenUsuario[]
+  carritos      Carrito[]
+  cajas         Caja[]
+}
+
+enum Rol {
+  ADMIN
+  PADRE
+  EMPLEADO
+}
+
+model RolUsuario {
+  idRol    Int       @id @default(autoincrement())
+  nombre   Rol       @unique
+  usuarios Usuario[]
+}
+
+enum TipoToken {
+  RECUPERACION_CONTRASENA
+  VALIDACION_CORREO
+}
+
+model TokenUsuario {
+  idToken         Int       @id @default(autoincrement())
+  token           String    @unique
+  fechaCreacion   DateTime  @default(now())
+  fechaExpiracion DateTime
+  tipo            TipoToken
+  usado           Boolean   @default(false)
+
+  usuarioId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [idUsuario])
+}
+
+model Paciente {
+  idPaciente     Int    @id @default(autoincrement())
+  nombreCompleto String
+  dni            String @unique
+  domicilo       String
+
+  usuarioId          Int
+  usuario            Usuario             @relation(fields: [usuarioId], references: [idUsuario])
+  fichaMedicas       FichaMedica[]
+  datosEscolares     DatosEscolares[]
+  obraSocials        ObraSocial[]
+  evolucionPacientes EvolucionPaciente[]
+  turnos             Turno[]
+  saldoPacientes     SaldoPaciente[]
+}
+
+model FichaMedica {
+  idFicha         Int     @id @default(autoincrement())
+  edad_camino     String?
+  socializacion   String?
+  derivacion      String?
+  horarios_sueño String?
+  contacto_visual String?
+  actividades     String?
+
+  pacienteId Int
+  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+}
+
+enum TurnoCursado {
+  MANANA
+  TARDE
+  NOCHE
+}
+
+model DatosEscolares {
+  idDatosEscolares Int          @id @default(autoincrement())
+  escuela          String
+  turno            TurnoCursado
+
+  pacienteId Int
+  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+}
+
+model ObraSocial {
+  idObraSocial     Int     @id @default(autoincrement())
+  nombre           String  @unique
+  precioConsulta   Decimal
+  duracionConsulta String
+
+  pacienteId Int
+  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+}
+
+model EvolucionPaciente {
+  idEvolucion Int      @id @default(autoincrement())
+  descripcion String
+  fecha       DateTime @default(now())
+
+  pacienteId Int
+  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+}
+
+enum EstadoTurno {
+  PENDIENTE
+  APROBADO
+  CANCELADO
+  FINALIZADO
+}
+
+model Turno {
+  idTurno Int         @id @default(autoincrement())
+  estado  EstadoTurno @default(PENDIENTE)
+  fecha   DateTime
+
+  pacienteId Int
+  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+
+  usuarioId Int
+
+  usuario Usuario @relation(fields: [usuarioId], references: [idUsuario])
+
+  @@unique([fecha])
+}
+
+enum TipoMovimientoSaldo {
+  INGRESO
+  CONSUMO
+  AJUSTE
+}
+
+model SaldoPaciente {
+  idSaldo     Int                 @id @default(autoincrement())
+  cantidad    Decimal
+  tipo        TipoMovimientoSaldo
+  descripcion String?
+  fecha       DateTime            @default(now())
+
+  pacienteId Int
+  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+}
+
+enum EstadoCarrito {
+  ACTIVO
+  COMPRADO
+}
+
+model Carrito {
+  idCarrito Int           @id @default(autoincrement())
+  estado    EstadoCarrito @default(ACTIVO)
+
+  usuarioId       Int
+  usuario         Usuario          @relation(fields: [usuarioId], references: [idUsuario])
+  detalleCarritos DetalleCarrito[]
+}
+
+model DetalleCarrito {
+  idDetalleCarrito Int     @id @default(autoincrement())
+  cantidad         Int
+  precio_unitario  Decimal
+
+  carritoId Int
+  carrito   Carrito @relation(fields: [carritoId], references: [idCarrito])
+
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [idProducto])
+}
+
+model Caja {
+  idCaja        Int       @id @default(autoincrement())
+  fechaApertura DateTime  @default(now())
+  fechaCierre   DateTime?
+  montoCierre   Decimal?
+
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [idUsuario])
+  ventas    Ventas[]
+}
