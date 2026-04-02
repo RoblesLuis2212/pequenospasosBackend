@@ -178,3 +178,40 @@ export const cambiarContrasena = async (req, res) => {
       .json({ mensaje: "Ocurrio un error al cambiar la contraseña" });
   }
 };
+
+export const editarUsuario = async (req, res) => {
+  try {
+    const idUsuario = Number(req.params.id);
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { idUsuario },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    const { nombreCompleto, telefono, email, rol } = req.body;
+    const usuarioActualizado = await prisma.usuario.update({
+      where: { idUsuario },
+      data: {
+        nombreCompleto,
+        telefono,
+        email,
+        rol: {
+          connect: { idRol: rol },
+        },
+      },
+    });
+
+    res.status(200).json({
+      mensaje: "Datos actualizados exitosamente",
+      usuario: usuarioActualizado,
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al editar los datos del usuario" });
+  }
+};
