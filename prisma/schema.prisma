@@ -138,7 +138,7 @@ model Paciente {
   idPaciente     Int    @id @default(autoincrement())
   nombreCompleto String
   dni            String @unique
-  domicilo       String
+  domicilio      String
 
   usuarioId          Int
   usuario            Usuario             @relation(fields: [usuarioId], references: [idUsuario])
