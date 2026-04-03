@@ -13,6 +13,7 @@ import {
 import verificarToken from "../middlewares/validarToken.js";
 import validacionesUsuarios from "../middlewares/validacionUsuarios.js";
 import validacionLogin from "../middlewares/validacionLogin.js";
+import validacionEstadoUsuarios from "../middlewares/validacionEstadoUsuarios.js";
 
 const router = Router();
 router
@@ -25,7 +26,7 @@ router.route("/forgot-password").post(verificarToken, correoOlvidoPassword);
 router.route("/reset-password").post(verificarToken, resetPassword);
 router
   .route("/:id")
-  .patch(verificarToken, cambiarEstadoUsuario)
+  .patch(verificarToken, validacionEstadoUsuarios, cambiarEstadoUsuario)
   .get(obtenerUsuarioID)
   .put(verificarToken, editarUsuario);
 
