@@ -20,15 +20,14 @@ const validacionesUsuarios = [
     .withMessage("El email ingresado no es valido")
     .normalizeEmail()
     .custom(async (valor, { req }) => {
-      const edicion = false;
       const correoExistente = await prisma.usuario.findUnique({
         where: { email: valor },
       });
-      console.log(correoExistente);
+      //verificamos si el correo ya esta en uso o no
       if (!correoExistente) {
         return true;
       }
-
+      //Comprobamos si se esta creando o editando un usuario depende de si recibimos o no un parametro
       if (
         req.params?.id &&
         correoExistente.idUsuario === Number(req.params.id)
