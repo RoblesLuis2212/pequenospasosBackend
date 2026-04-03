@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import resultadoValidacion from "./resultadoValidacion.js";
 import { prisma } from "../server/prisma.js";
 
-const validacionesUsuarios = [
+const validacionEdicionUsuario = [
   body("nombreCompleto")
     .notEmpty()
     .withMessage("El nombre es un dato obligatorio")
@@ -37,15 +37,6 @@ const validacionesUsuarios = [
       }
       throw new Error("El correo ingresado ya existe");
     }),
-  body("password")
-    .notEmpty()
-    .withMessage("La contraseña es un dato obligatorio")
-    .isLength({ min: 8 })
-    .withMessage("La contraseña debe contener minimo 8 caracteres")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)
-    .withMessage(
-      "La contraseña debe incluir una letra mayuscula, una mininuscula, un numero y un caracter especial",
-    ),
   body("estado")
     .optional()
     .isIn(["ACTIVO", "INACTIVO"])
@@ -64,4 +55,4 @@ const validacionesUsuarios = [
   (req, res, next) => resultadoValidacion(req, res, next),
 ];
 
-export default validacionesUsuarios;
+export default validacionEdicionUsuario;

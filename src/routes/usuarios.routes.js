@@ -14,6 +14,8 @@ import verificarToken from "../middlewares/validarToken.js";
 import validacionesUsuarios from "../middlewares/validacionUsuarios.js";
 import validacionLogin from "../middlewares/validacionLogin.js";
 import validacionEstadoUsuarios from "../middlewares/validacionEstadoUsuarios.js";
+import validacionID from "../middlewares/validacionID.js";
+import validacionEdicionUsuario from "../middlewares/validacionEdicionUsuario.js";
 
 const router = Router();
 router
@@ -26,8 +28,13 @@ router.route("/forgot-password").post(verificarToken, correoOlvidoPassword);
 router.route("/reset-password").post(verificarToken, resetPassword);
 router
   .route("/:id")
-  .patch(verificarToken, validacionEstadoUsuarios, cambiarEstadoUsuario)
-  .get(obtenerUsuarioID)
-  .put(verificarToken, editarUsuario);
+  .patch(
+    verificarToken,
+    validacionID,
+    validacionEstadoUsuarios,
+    cambiarEstadoUsuario,
+  )
+  .get(validacionID, obtenerUsuarioID)
+  .put(verificarToken, validacionID, validacionEdicionUsuario, editarUsuario);
 
 export default router;

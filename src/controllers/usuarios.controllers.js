@@ -195,7 +195,7 @@ export const editarUsuario = async (req, res) => {
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
-    const { nombreCompleto, telefono, email, rol } = req.body;
+    const { nombreCompleto, telefono, email, rolId } = req.body;
     const usuarioActualizado = await prisma.usuario.update({
       where: { idUsuario },
       data: {
@@ -203,7 +203,7 @@ export const editarUsuario = async (req, res) => {
         telefono,
         email,
         rol: {
-          connect: { idRol: rol },
+          connect: { idRol: rolId },
         },
       },
     });
