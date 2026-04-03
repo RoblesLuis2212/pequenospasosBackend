@@ -32,6 +32,20 @@ const validacionPacientes = [
     .withMessage("El domicilio es un dato obligatorio")
     .isLength({ min: 5, max: 70 })
     .withMessage("El domicilio debe contener entre 5 y 70 caracteres"),
+  body("fechaNacimiento")
+    .notEmpty()
+    .withMessage("La fecha de nacimiento es un dato obligatorio")
+    .isISO8601()
+    .withMessage("El formato de fecha no es valido")
+    .toDate()
+    .custom((valor) => {
+      if (new Date(valor) > new Date()) {
+        throw new Error(
+          "La fecha de nacimiento no puede ser mayor a la actual",
+        );
+      }
+      return true;
+    }),
   (req, res, next) => resultadoValidacion(req, res, next),
 ];
 

@@ -135,10 +135,11 @@ model TokenUsuario {
 }
 
 model Paciente {
-  idPaciente     Int    @id @default(autoincrement())
-  nombreCompleto String
-  dni            String @unique
-  domicilio      String
+  idPaciente      Int      @id @default(autoincrement())
+  nombreCompleto  String
+  dni             String   @unique
+  domicilio       String
+  fechaNacimiento DateTime
 
   usuarioId          Int
   usuario            Usuario             @relation(fields: [usuarioId], references: [idUsuario])
