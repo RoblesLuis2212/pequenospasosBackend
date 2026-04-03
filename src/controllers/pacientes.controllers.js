@@ -2,8 +2,16 @@ import { prisma } from "../server/prisma.js";
 
 export const agregarPaciente = async (req, res) => {
   try {
+    const { nombreCompleto, dni, domicilio, fechaNacimiento, usuarioId } =
+      req.body;
     const nuevoPaciente = await prisma.paciente.create({
-      data: req.body,
+      data: {
+        nombreCompleto,
+        dni,
+        domicilio,
+        fechaNacimiento: new Date(fechaNacimiento),
+        usuarioId,
+      },
     });
     res.status(201).json({
       mensaje: "Paciente agregado exitosamente",
