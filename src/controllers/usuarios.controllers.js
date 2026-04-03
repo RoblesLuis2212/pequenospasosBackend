@@ -2,6 +2,10 @@ import { basename } from "node:path";
 import { prisma } from "../server/prisma.js";
 import bcrypt from "bcrypt";
 import generarJWT from "../middlewares/generarJWT.js";
+import { token } from "morgan";
+import { Resend } from "resend";
+import { json } from "node:stream/consumers";
+import crypto from "crypto";
 
 export const crearUsuario = async (req, res) => {
   try {
@@ -213,5 +217,107 @@ export const editarUsuario = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al editar los datos del usuario" });
+  }
+};
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export const correoOlvidoPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const usuario = await prisma.usuario.findUnique({
+      where: { email },
+    });
+
+    if (!usuario) {
+      return res
+        .status(200)
+        .json({ mensaje: "Si el email existe, se envio un enlace al correo" });
+    }
+    //invalidar tokens anteriores
+    await prisma.tokenUsuario.updateMany({
+      where: {
+        usuarioId: usuario.idUsuario,
+        tipo: "RECUPERACION_CONTRASENA",
+        usado: false,
+      },
+      data: { usado: true },
+    });
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const fechaExpiracion = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+    //se genera un nuevo token
+    await prisma.tokenUsuario.create({
+      data: {
+        token,
+        fechaExpiracion,
+        tipo: "RECUPERACION_CONTRASENA",
+        usado: false,
+        usuarioId: usuario.idUsuario,
+      },
+    });
+
+    const linkOlvidoPassword = `${process.env.FRONTEND_URL}/resetPassword?token=${token}`;
+
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Recuperar contraseña",
+      html: `
+        <p>Hola ${usuario.nombreCompleto},</p>
+        <p>Recibimos una solicitud para restablecer tu contraseña.</p>
+        <p>
+          <a href="${linkOlvidoPassword}">Hacer clic aquí para restablecer tu contraseña</a>
+        </p>
+        <p>Este enlace expira en 1 hora. Si no solicitaste esto, ignorá este email.</p>
+      `,
+    });
+    res.status(200).json({ mensaje: "Si el email existe recibiras un enlace" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error interno en el servidor" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, nuevaPassword } = req.body;
+  try {
+    const tokenRecord = await prisma.tokenUsuario.findUnique({
+      where: { token },
+    });
+
+    if (!tokenRecord) {
+      return res.status(400).json({ mensaje: "Token invalido" });
+    }
+
+    if (tokenRecord.usado) {
+      return res.status(400).json({ mensaje: "El token ya fue utilizado" });
+    }
+
+    if (tokenRecord.fechaExpiracion < new Date()) {
+      return res.status(400).json({ mensaje: "El token expiro" });
+    }
+
+    if (tokenRecord.tipo !== "RECUPERACION_CONTRASENA") {
+      return res.status(400).json({ mensaje: "Token invalido" });
+    }
+
+    const passwordHash = bcrypt.hashSync(nuevaPassword, 10);
+    await prisma.$transaction([
+      prisma.usuario.update({
+        where: { idUsuario: tokenRecord.usuarioId },
+        data: { password: passwordHash },
+      }),
+    ]);
+
+    prisma.tokenUsuario.update({
+      where: { idToken: tokenRecord.idToken },
+      data: { usado: true },
+    });
+
+    res.status(200).json({ mensaje: "Contraseña actualizada exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error interno del servidor" });
   }
 };
