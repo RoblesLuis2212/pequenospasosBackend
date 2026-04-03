@@ -12,19 +12,20 @@ import {
 } from "../controllers/usuarios.controllers.js";
 import verificarToken from "../middlewares/validarToken.js";
 import validacionesUsuarios from "../middlewares/validacionUsuarios.js";
+import validacionLogin from "../middlewares/validacionLogin.js";
 
 const router = Router();
 router
   .route("/")
   .post(validacionesUsuarios, crearUsuario)
   .get(verificarToken, listarUsuarios);
-router.route("/login").post(login);
+router.route("/login").post(validacionLogin, login);
 router.route("/cambiar-Password").put(verificarToken, cambiarContrasena);
-router.route("/forgot-password").post(correoOlvidoPassword);
-router.route("/reset-password").post(resetPassword);
+router.route("/forgot-password").post(verificarToken, correoOlvidoPassword);
+router.route("/reset-password").post(verificarToken, resetPassword);
 router
   .route("/:id")
-  .patch(cambiarEstadoUsuario)
+  .patch(verificarToken, cambiarEstadoUsuario)
   .get(obtenerUsuarioID)
   .put(verificarToken, editarUsuario);
 
