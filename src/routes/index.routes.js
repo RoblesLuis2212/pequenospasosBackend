@@ -1,9 +1,11 @@
 import { Router } from "express";
 import routerUsuarios from "./usuarios.routes.js";
 import routerPacientes from "./pacientes.routes.js";
+import routerTurnos from "./turnos.routes.js";
 
 const router = Router();
 router.use("/usuarios", routerUsuarios);
 router.use("/pacientes", routerPacientes);
+router.use("/turnos", routerTurnos);
 
 export default router;
