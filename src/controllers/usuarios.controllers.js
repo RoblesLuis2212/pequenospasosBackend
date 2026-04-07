@@ -121,6 +121,16 @@ export const obtenerUsuarioID = async (req, res) => {
         nombreCompleto: true,
         email: true,
         telefono: true,
+
+        pacientes: {
+          select: {
+            idPaciente: true,
+            nombreCompleto: true,
+            dni: true,
+            fechaNacimiento: true,
+            domicilio: true,
+          },
+        },
       },
     });
     if (!usuarioBuscado) {
