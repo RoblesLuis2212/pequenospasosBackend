@@ -8,11 +8,15 @@ const validacionObraSocial = [
     .withMessage("El nombre es un dato obligatorio")
     .isLength({ min: 5, max: 50 })
     .withMessage("El nombre debe contener entre 5 y 50 caracteres")
-    .custom(async (valor) => {
+    .custom(async (valor, { req }) => {
       const obraSocialExistente = await prisma.obraSocial.findUnique({
         where: { nombre: valor },
       });
-      if (obraSocialExistente) {
+      //verificamos si se esta editando o creando
+      if (
+        obraSocialExistente &&
+        obraSocialExistente.idObraSocial !== Number(req.params.id)
+      ) {
         throw new Error("La obra social ya esta disponible");
       }
       return true;

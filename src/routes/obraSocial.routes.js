@@ -7,16 +7,18 @@ import {
   obtenerObraSocialID,
 } from "../controllers/obraSocial.controllers.js";
 import validacionObraSocial from "../middlewares/validacionObraSocial.js";
+import verificarToken from "../middlewares/validarToken.js";
+import validacionID from "../middlewares/validacionID.js";
 
 const router = Router();
 router
   .route("/")
-  .post(validacionObraSocial, agregarObraSocial)
-  .get(listarObrasSociales);
+  .post(verificarToken, validacionObraSocial, agregarObraSocial)
+  .get(verificarToken, listarObrasSociales);
 router
   .route("/:id")
-  .put(validacionObraSocial, editarObraSocial)
-  .patch(cambiarEstadoObraSocial)
-  .get(obtenerObraSocialID);
+  .put(verificarToken, validacionID, validacionObraSocial, editarObraSocial)
+  .patch(verificarToken, validacionID, cambiarEstadoObraSocial)
+  .get(verificarToken, validacionID, obtenerObraSocialID);
 
 export default router;
