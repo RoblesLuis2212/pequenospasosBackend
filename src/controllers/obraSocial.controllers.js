@@ -52,3 +52,31 @@ export const editarObraSocial = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error editar la obra social" });
   }
 };
+
+export const cambiarEstadoObraSocial = async (req, res) => {
+  try {
+    const obraSocial = await prisma.obraSocial.findUnique({
+      where: { idObraSocial: Number(req.params.id) },
+    });
+
+    if (!obraSocial) {
+      return res.status(401).json({ mensaje: "Obra social no encontrada" });
+    }
+
+    const nuevoEstado = obraSocial.estado === "ACTIVA" ? "INACTIVA" : "ACTIVA";
+
+    await prisma.obraSocial.update({
+      where: { idObraSocial: Number(req.params.id) },
+      data: { estado: nuevoEstado },
+    });
+
+    res
+      .status(200)
+      .json({ mensaje: "Estado de obra social actualizado exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al cambiar el estado de la obra social",
+    });
+  }
+};
