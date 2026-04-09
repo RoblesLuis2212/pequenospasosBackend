@@ -180,11 +180,17 @@ model DatosEscolares {
   pacienteIdPaciente Int
 }
 
+enum estadoObraSocial {
+  ACTIVA
+  INACTIVA
+}
+
 model ObraSocial {
-  idObraSocial     Int     @id @default(autoincrement())
-  nombre           String  @unique
+  idObraSocial     Int              @id @default(autoincrement())
+  nombre           String           @unique
   precioConsulta   Decimal
   duracionConsulta String
+  estado           estadoObraSocial @default(ACTIVA)
 
   paciente Paciente[]
 }
