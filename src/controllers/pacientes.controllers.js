@@ -52,7 +52,7 @@ export const actualizarDatos = async (req, res) => {
 
     const pacienteActualizado = await prisma.paciente.update({
       where: { idPaciente },
-      data: req.body,
+      data: { ...req.body, obraSocialId: Number(req.body.obraSocialId) },
     });
 
     res.status(200).json({
