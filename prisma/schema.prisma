@@ -145,7 +145,8 @@ model Paciente {
   usuario            Usuario             @relation(fields: [usuarioId], references: [idUsuario])
   fichaMedicas       FichaMedica[]
   datosEscolares     DatosEscolares[]
-  obraSocials        ObraSocial[]
+  obraSocialId       Int?
+  obraSocial         ObraSocial?         @relation(fields: [obraSocialId], references: [idObraSocial])
   evolucionPacientes EvolucionPaciente[]
   turnos             Turno[]
   saldoPacientes     SaldoPaciente[]
@@ -175,18 +176,23 @@ model DatosEscolares {
   escuela          String
   turno            TurnoCursado
 
-  pacienteId Int
-  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+  paciente           Paciente @relation(fields: [pacienteIdPaciente], references: [idPaciente])
+  pacienteIdPaciente Int
+}
+
+enum estadoObraSocial {
+  ACTIVA
+  INACTIVA
 }
 
 model ObraSocial {
-  idObraSocial     Int     @id @default(autoincrement())
-  nombre           String  @unique
+  idObraSocial     Int              @id @default(autoincrement())
+  nombre           String           @unique
   precioConsulta   Decimal
   duracionConsulta String
+  estado           estadoObraSocial @default(ACTIVA)
 
-  pacienteId Int
-  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
+  paciente Paciente[]
 }
 
 model EvolucionPaciente {
