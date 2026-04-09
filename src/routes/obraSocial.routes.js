@@ -1,7 +1,12 @@
 import { Router } from "express";
-import { agregarObraSocial } from "../controllers/obraSocial.controllers.js";
+import {
+  agregarObraSocial,
+  editarObraSocial,
+  listarObrasSociales,
+} from "../controllers/obraSocial.controllers.js";
 
 const router = Router();
-router.route("/").post(agregarObraSocial);
+router.route("/").post(agregarObraSocial).get(listarObrasSociales);
+router.route("/:id").put(editarObraSocial);
 
 export default router;
