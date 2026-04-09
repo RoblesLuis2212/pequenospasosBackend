@@ -1,3 +1,4 @@
+import { response } from "express";
 import { prisma } from "../server/prisma.js";
 
 export const agregarObraSocial = async (req, res) => {
@@ -78,5 +79,23 @@ export const cambiarEstadoObraSocial = async (req, res) => {
     res.status(500).json({
       mensaje: "Ocurrio un error al cambiar el estado de la obra social",
     });
+  }
+};
+
+export const obtenerObraSocialID = async (req, res) => {
+  try {
+    const obraSocial = await prisma.obraSocial.findUnique({
+      where: { idObraSocial: Number(req.params.id) },
+    });
+
+    if (!obraSocial) {
+      return res.status(401).json({ mensaje: "La obra social no existe" });
+    }
+    res.status(200).json(obraSocial);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al obtener la obra social" });
   }
 };
