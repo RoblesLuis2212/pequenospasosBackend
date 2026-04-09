@@ -82,6 +82,13 @@ export const obtenerPacienteID = async (req, res) => {
             email: true,
           },
         },
+        obraSocial: {
+          select: {
+            nombre: true,
+            precioConsulta: true,
+            duracionConsulta: true,
+          },
+        },
       },
     });
     if (!datosPaciente) {
