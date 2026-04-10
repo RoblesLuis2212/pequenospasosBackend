@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  cambiarEstadoTurno,
   crearTurno,
   listarTurnos,
   listarTurnosporUsuario,
@@ -17,6 +18,9 @@ router
 router
   .route("/turnos-usuario/:id")
   .get(verificarToken, validacionID, listarTurnosporUsuario);
-router.route("/:id").get(validacionID, obtenerInformacionTurno);
+router
+  .route("/:id")
+  .get(validacionID, obtenerInformacionTurno)
+  .patch(validacionID, cambiarEstadoTurno);
 
 export default router;

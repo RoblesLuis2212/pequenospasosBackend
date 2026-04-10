@@ -70,12 +70,30 @@ export const listarTurnosporUsuario = async (req, res) => {
   try {
     const usuarioId = req.usuario.idUsuario;
     const turnos = await prisma.turno.findMany({
-      where: { usuarioId },
-      include: {
+      where: {
         paciente: {
+          usuarioId: usuarioId,
+        },
+      },
+      include: {
+        usuario: {
           select: {
             nombreCompleto: true,
-            dni: true,
+          },
+        },
+        paciente: {
+          include: {
+            obraSocial: {
+              select: {
+                nombre: true,
+                duracionConsulta: true,
+              },
+            },
+            usuario: {
+              select: {
+                nombreCompleto: true,
+              },
+            },
           },
         },
       },
@@ -87,5 +105,27 @@ export const listarTurnosporUsuario = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al listar los turnos del usuario" });
+  }
+};
+
+export const cambiarEstadoTurno = async (req, res) => {
+  try {
+    const { estado } = req.body;
+    const turnoActualizado = await prisma.turno.updateMany({
+      where: { idTurno: Number(req.params.id) },
+      data: { estado: estado },
+    });
+
+    res
+      .status(200)
+      .json({
+        mensaje: "Turno actualizado correctamente",
+        turno: turnoActualizado,
+      });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al cambiar el estado del turno" });
   }
 };
