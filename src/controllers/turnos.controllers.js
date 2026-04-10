@@ -51,3 +51,17 @@ export const obtenerInformacionTurno = async (req, res) => {
     });
   }
 };
+
+export const listarTurnos = async (req, res) => {
+  try {
+    const turnos = await prisma.turno.findMany();
+
+    if (!turnos) {
+      return res.status(404).json({ mensaje: "No hay turnos para listar" });
+    }
+    res.status(200).json(turnos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al listar los turnos" });
+  }
+};
