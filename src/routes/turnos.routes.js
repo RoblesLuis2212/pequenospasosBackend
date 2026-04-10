@@ -9,6 +9,7 @@ import {
 import verificarToken from "../middlewares/validarToken.js";
 import validacionTurnos from "../middlewares/validacionTurnos.js";
 import validacionID from "../middlewares/validacionID.js";
+import validacionEstadoTurnos from "../middlewares/validacionEstadoTurnos.js";
 
 const router = Router();
 router
@@ -21,6 +22,11 @@ router
 router
   .route("/:id")
   .get(validacionID, obtenerInformacionTurno)
-  .patch(validacionID, cambiarEstadoTurno);
+  .patch(
+    verificarToken,
+    validacionEstadoTurnos,
+    validacionID,
+    cambiarEstadoTurno,
+  );
 
 export default router;
