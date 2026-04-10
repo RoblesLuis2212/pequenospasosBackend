@@ -65,3 +65,27 @@ export const listarTurnos = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al listar los turnos" });
   }
 };
+
+export const listarTurnosporUsuario = async (req, res) => {
+  try {
+    const usuarioId = req.usuario.idUsuario;
+    const turnos = await prisma.turno.findMany({
+      where: { usuarioId },
+      include: {
+        paciente: {
+          select: {
+            nombreCompleto: true,
+            dni: true,
+          },
+        },
+      },
+      orderBy: { fecha: "asc" },
+    });
+    res.status(200).json(turnos);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al listar los turnos del usuario" });
+  }
+};
