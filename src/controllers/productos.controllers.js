@@ -1,13 +1,34 @@
+import subirImagenCloudinary from "../helpers/cloudinaryUploader.js";
 import { prisma } from "../server/prisma.js";
 
 export const agregarProducto = async (req, res) => {
   try {
-    const nuevoProducto = await prisma.producto.create({
-      data: req.body,
+    let imagen_url = "";
+
+    if (req.file) {
+      const resultado = await subirImagenCloudinary(req.file.buffer);
+      imagen_url = resultado.secure_url;
+    } else {
+      imagen_url =
+        "https://static.vecteezy.com/system/resources/thumbnails/008/015/799/small_2x/illustration-of-no-image-available-icon-template-for-no-image-or-picture-coming-soon-free-vector.jpg";
+    }
+
+    const { nombre, precio, stock, descripcion, codigoBarras } = req.body;
+
+    const producto = await prisma.producto.create({
+      data: {
+        nombre,
+        precio,
+        stock: Number(stock),
+        descripcion,
+        codigoBarras,
+        imagen: imagen_url,
+      },
     });
+
     res.status(201).json({
-      mensaje: "Producto agregado exitosamente",
-      producto: nuevoProducto,
+      mensaje: "Producto agregado correctamente",
+      producto: producto,
     });
   } catch (err) {
     console.error(err);
@@ -55,19 +76,27 @@ export const actualizarDatosProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
     });
 
-    const { nombre, precio, stock, descripcion, imagen } = req.body;
+    const { nombre, precio, stock, descripcion } = req.body;
 
     if (!productoBuscado) {
       return res.status(404).json({ mensaje: "Producto no encontrado" });
     }
+
+    let imagen_url = productoBuscado.imagen;
+
+    if (req.file) {
+      const resultado = await subirImagenCloudinary(req.file.buffer);
+      imagen_url = resultado.secure_url;
+    }
+
     const productoActualizado = await prisma.producto.update({
       where: { idProducto: Number(req.params.id) },
       data: {
         nombre,
         precio,
-        stock,
+        stock: Number(stock),
         descripcion,
-        imagen,
+        imagen: imagen_url,
       },
     });
     res.status(200).json({
