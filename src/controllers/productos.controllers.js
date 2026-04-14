@@ -67,7 +67,6 @@ export const actualizarDatosProducto = async (req, res) => {
         precio,
         stock,
         imagen,
-        estado,
       },
     });
     res.status(200).json({
@@ -79,5 +78,36 @@ export const actualizarDatosProducto = async (req, res) => {
     res.status(500).json({
       mensaje: "Ocurrio un error al actualizar los datos del producto",
     });
+  }
+};
+
+export const cambiarEstadoProducto = async (req, res) => {
+  try {
+    const producto = await prisma.producto.findUnique({
+      where: { idProducto: Number(req.params.id) },
+    });
+
+    if (!producto) {
+      return res.status(404).json({ mensaje: "Producto no encontrado" });
+    }
+
+    const nuevoEstado =
+      producto.estado === "DISPONIBLE" ? "INACTIVO" : "DISPONIBLE";
+
+    const productoActualizado = await prisma.producto.update({
+      where: { idProducto: Number(req.params.id) },
+      data: { estado: nuevoEstado },
+    });
+    res
+      .status(200)
+      .json({
+        mensaje: "Estado del producto actualizado exitosamente",
+        producto: productoActualizado,
+      });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al cambiar el estado del producto" });
   }
 };

@@ -2,12 +2,17 @@ import { Router } from "express";
 import {
   actualizarDatosProducto,
   agregarProducto,
+  cambiarEstadoProducto,
   listarProductos,
   obtenerProductoID,
 } from "../controllers/productos.controllers.js";
 
 const router = Router();
 router.route("/").post(agregarProducto).get(listarProductos);
-router.route("/:id").get(obtenerProductoID).put(actualizarDatosProducto);
+router
+  .route("/:id")
+  .get(obtenerProductoID)
+  .put(actualizarDatosProducto)
+  .patch(cambiarEstadoProducto);
 
 export default router;
