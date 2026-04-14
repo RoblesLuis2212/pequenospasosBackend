@@ -222,8 +222,6 @@ model Turno {
   usuarioId Int
 
   usuario Usuario @relation(fields: [usuarioId], references: [idUsuario])
-
-  @@unique([fecha])
 }
 
 enum TipoMovimientoSaldo {
