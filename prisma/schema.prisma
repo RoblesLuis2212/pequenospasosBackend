@@ -17,6 +17,7 @@ model Producto {
   nombre                   String
   precio                   Decimal
   stock                    Int
+  descripcion              String
   fechaCreacion            DateTime       @default(now())
   imagen                   String
   fechaUltimaActualizacion DateTime       @updatedAt

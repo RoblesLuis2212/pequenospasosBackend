@@ -55,7 +55,7 @@ export const actualizarDatosProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
     });
 
-    const { nombre, precio, stock, imagen, estado } = req.body;
+    const { nombre, precio, stock, descripcion, imagen } = req.body;
 
     if (!productoBuscado) {
       return res.status(404).json({ mensaje: "Producto no encontrado" });
@@ -66,6 +66,7 @@ export const actualizarDatosProducto = async (req, res) => {
         nombre,
         precio,
         stock,
+        descripcion,
         imagen,
       },
     });
@@ -98,12 +99,10 @@ export const cambiarEstadoProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
       data: { estado: nuevoEstado },
     });
-    res
-      .status(200)
-      .json({
-        mensaje: "Estado del producto actualizado exitosamente",
-        producto: productoActualizado,
-      });
+    res.status(200).json({
+      mensaje: "Estado del producto actualizado exitosamente",
+      producto: productoActualizado,
+    });
   } catch (err) {
     console.error(err);
     res

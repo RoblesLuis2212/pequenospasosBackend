@@ -6,13 +6,18 @@ import {
   listarProductos,
   obtenerProductoID,
 } from "../controllers/productos.controllers.js";
+import validacionProductos from "../middlewares/validacionProductos.js";
+import verificarToken from "../middlewares/validarToken.js";
 
 const router = Router();
-router.route("/").post(agregarProducto).get(listarProductos);
+router
+  .route("/")
+  .post(verificarToken, validacionProductos, agregarProducto)
+  .get(listarProductos);
 router
   .route("/:id")
   .get(obtenerProductoID)
-  .put(actualizarDatosProducto)
-  .patch(cambiarEstadoProducto);
+  .put(verificarToken, validacionProductos, actualizarDatosProducto)
+  .patch(verificarToken, cambiarEstadoProducto);
 
 export default router;
