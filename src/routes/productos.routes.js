@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   actualizarDatosProducto,
+  agregarCategoriaProducto,
   agregarProducto,
   cambiarEstadoProducto,
   listarProductos,
@@ -36,5 +37,6 @@ router
     actualizarDatosProducto,
   )
   .patch(verificarToken, validacionEstadoProducto, cambiarEstadoProducto);
+router.route("/categorias").post(agregarCategoriaProducto);
 
 export default router;

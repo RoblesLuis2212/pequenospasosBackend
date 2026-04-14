@@ -13,7 +13,8 @@ export const agregarProducto = async (req, res) => {
         "https://static.vecteezy.com/system/resources/thumbnails/008/015/799/small_2x/illustration-of-no-image-available-icon-template-for-no-image-or-picture-coming-soon-free-vector.jpg";
     }
 
-    const { nombre, precio, stock, descripcion, codigoBarras } = req.body;
+    const { nombre, precio, stock, descripcion, codigoBarras, categoria } =
+      req.body;
 
     const producto = await prisma.producto.create({
       data: {
@@ -23,6 +24,11 @@ export const agregarProducto = async (req, res) => {
         descripcion,
         codigoBarras,
         imagen: imagen_url,
+        categoria: {
+          connect: {
+            idCategoria: Number(categoria),
+          },
+        },
       },
     });
 
@@ -40,7 +46,11 @@ export const agregarProducto = async (req, res) => {
 
 export const listarProductos = async (req, res) => {
   try {
-    const productos = await prisma.producto.findMany();
+    const productos = await prisma.producto.findMany({
+      include: {
+        categoria: true,
+      },
+    });
 
     if (!productos) {
       return res.status(404).json({ mensaje: "No hay productos para listar" });
@@ -76,7 +86,7 @@ export const actualizarDatosProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
     });
 
-    const { nombre, precio, stock, descripcion } = req.body;
+    const { nombre, precio, stock, descripcion, categoria } = req.body;
 
     if (!productoBuscado) {
       return res.status(404).json({ mensaje: "Producto no encontrado" });
@@ -97,6 +107,11 @@ export const actualizarDatosProducto = async (req, res) => {
         stock: Number(stock),
         descripcion,
         imagen: imagen_url,
+        categoria: {
+          connect: {
+            idCategoria: Number(categoria),
+          },
+        },
       },
     });
     res.status(200).json({
@@ -137,5 +152,20 @@ export const cambiarEstadoProducto = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al cambiar el estado del producto" });
+  }
+};
+
+export const agregarCategoriaProducto = async (req, res) => {
+  try {
+    const nuevaCategoria = await prisma.categoria.create({
+      data: req.body,
+    });
+    res.status(201).json({
+      mensaje: "Categoria creada correctamente",
+      categoria: nuevaCategoria,
+    });
+  } catch (err) {
+    console.error(err);
+    return null;
   }
 };
