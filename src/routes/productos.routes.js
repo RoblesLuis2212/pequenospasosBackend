@@ -11,6 +11,7 @@ import verificarToken from "../middlewares/validarToken.js";
 import validacionEstadoProducto from "../middlewares/ValidacionEstadoProducto.js";
 import errorMulter from "../middlewares/ErrorMulter.js";
 import upload from "../helpers/upload.js";
+import validacionID from "../middlewares/validacionID.js";
 
 const router = Router();
 router
@@ -26,7 +27,14 @@ router
 router
   .route("/:id")
   .get(obtenerProductoID)
-  .put(verificarToken, validacionProductos, actualizarDatosProducto)
+  .put(
+    verificarToken,
+    validacionID,
+    upload.single("imagen"),
+    errorMulter,
+    validacionProductos,
+    actualizarDatosProducto,
+  )
   .patch(verificarToken, validacionEstadoProducto, cambiarEstadoProducto);
 
 export default router;

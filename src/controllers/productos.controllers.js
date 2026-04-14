@@ -76,19 +76,27 @@ export const actualizarDatosProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
     });
 
-    const { nombre, precio, stock, descripcion, imagen } = req.body;
+    const { nombre, precio, stock, descripcion } = req.body;
 
     if (!productoBuscado) {
       return res.status(404).json({ mensaje: "Producto no encontrado" });
     }
+
+    let imagen_url = productoBuscado.imagen;
+
+    if (req.file) {
+      const resultado = await subirImagenCloudinary(req.file.buffer);
+      imagen_url = resultado.secure_url;
+    }
+
     const productoActualizado = await prisma.producto.update({
       where: { idProducto: Number(req.params.id) },
       data: {
         nombre,
         precio,
-        stock,
+        stock: Number(stock),
         descripcion,
-        imagen,
+        imagen: imagen_url,
       },
     });
     res.status(200).json({
