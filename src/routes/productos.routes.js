@@ -8,6 +8,7 @@ import {
 } from "../controllers/productos.controllers.js";
 import validacionProductos from "../middlewares/validacionProductos.js";
 import verificarToken from "../middlewares/validarToken.js";
+import validacionEstadoProducto from "../middlewares/ValidacionEstadoProducto.js";
 
 const router = Router();
 router
@@ -18,6 +19,6 @@ router
   .route("/:id")
   .get(obtenerProductoID)
   .put(verificarToken, validacionProductos, actualizarDatosProducto)
-  .patch(verificarToken, cambiarEstadoProducto);
+  .patch(verificarToken, validacionEstadoProducto, cambiarEstadoProducto);
 
 export default router;
