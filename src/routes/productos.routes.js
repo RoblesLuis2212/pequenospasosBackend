@@ -9,11 +9,19 @@ import {
 import validacionProductos from "../middlewares/validacionProductos.js";
 import verificarToken from "../middlewares/validarToken.js";
 import validacionEstadoProducto from "../middlewares/ValidacionEstadoProducto.js";
+import errorMulter from "../middlewares/ErrorMulter.js";
+import upload from "../helpers/upload.js";
 
 const router = Router();
 router
   .route("/")
-  .post(verificarToken, validacionProductos, agregarProducto)
+  .post(
+    verificarToken,
+    upload.single("imagen"),
+    errorMulter,
+    validacionProductos,
+    agregarProducto,
+  )
   .get(listarProductos);
 router
   .route("/:id")
