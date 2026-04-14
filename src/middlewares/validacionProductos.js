@@ -56,6 +56,11 @@ const validacionProductos = [
       }
       return true;
     }),
+  body("categoria")
+    .notEmpty()
+    .withMessage("La categoria es un dato obligatorio")
+    .isInt()
+    .withMessage("La categoria debe ser un numero entero"),
   (req, res, next) => resultadoValidacion(req, res, next),
 ];
 
