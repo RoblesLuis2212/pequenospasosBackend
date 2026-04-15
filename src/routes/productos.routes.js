@@ -5,6 +5,7 @@ import {
   agregarProducto,
   cambiarEstadoProducto,
   listarProductos,
+  listarProductosInicio,
   obtenerProductoID,
 } from "../controllers/productos.controllers.js";
 import validacionProductos from "../middlewares/validacionProductos.js";
@@ -25,6 +26,7 @@ router
     agregarProducto,
   )
   .get(listarProductos);
+router.route("/inicio").get(listarProductosInicio);
 router
   .route("/:id")
   .get(obtenerProductoID)

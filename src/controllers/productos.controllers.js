@@ -169,3 +169,27 @@ export const agregarCategoriaProducto = async (req, res) => {
     return null;
   }
 };
+
+export const listarProductosInicio = async (req, res) => {
+  try {
+    const productos = await prisma.producto.findMany({
+      include: {
+        categoria: true,
+      },
+      take: 8,
+      orderBy: {
+        idProducto: "desc",
+      },
+    });
+    if (!productos) {
+      return res.status(404).json({ mensaje: "No hay productos para listar" });
+    }
+
+    res.status(200).json(productos);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al listar los productos" });
+  }
+};
