@@ -50,11 +50,11 @@ model Ventas {
   descripcion String?
   estado      EstadoVenta @default(PENDIENTE)
 
-  metodoPagoId Int
-  metodopago   MetodoPago @relation(fields: [metodoPagoId], references: [idMetodoPago])
+  metodoPagoId Int?
+  metodopago   MetodoPago? @relation(fields: [metodoPagoId], references: [idMetodoPago])
 
-  cajaId Int
-  caja   Caja @relation(fields: [cajaId], references: [idCaja])
+  cajaId Int?
+  caja   Caja? @relation(fields: [cajaId], references: [idCaja])
 
   detalles DetalleVenta[]
 }
@@ -244,6 +244,7 @@ model SaldoPaciente {
 
 enum EstadoCarrito {
   ACTIVO
+  PENDIENTE
   COMPRADO
 }
 
