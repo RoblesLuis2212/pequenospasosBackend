@@ -3,10 +3,13 @@ import {
   actualizarDatosProducto,
   agregarCategoriaProducto,
   agregarProducto,
+  buscarProducto,
   cambiarEstadoProducto,
+  filtrarporCategoria,
   listarProductos,
   listarProductosInicio,
   obtenerProductoID,
+  paginarProductos,
 } from "../controllers/productos.controllers.js";
 import validacionProductos from "../middlewares/validacionProductos.js";
 import verificarToken from "../middlewares/validarToken.js";
@@ -27,6 +30,9 @@ router
   )
   .get(listarProductos);
 router.route("/inicio").get(listarProductosInicio);
+router.route("/paginado").get(paginarProductos);
+router.route("/filtro").get(filtrarporCategoria);
+router.route("/buscar").get(buscarProducto);
 router
   .route("/:id")
   .get(obtenerProductoID)

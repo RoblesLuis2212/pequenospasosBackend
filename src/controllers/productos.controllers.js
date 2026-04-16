@@ -193,3 +193,89 @@ export const listarProductosInicio = async (req, res) => {
       .json({ mensaje: "Ocurrio un error al listar los productos" });
   }
 };
+
+export const paginarProductos = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [productos, cantidadProductos] = await Promise.all([
+      prisma.producto.findMany({
+        skip: skip,
+        take: limit,
+      }),
+      prisma.producto.count(),
+    ]);
+
+    res.status(200).json({
+      productos: productos,
+      paginaActual: page,
+      cantidadProductos,
+      cantPaginas: Math.ceil(cantidadProductos / limit),
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al listar los productos paginados" });
+  }
+};
+
+export const filtrarporCategoria = async (req, res) => {
+  try {
+    const { categoria } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+
+    const where = categoria ? { categoriaId: parseInt(categoria) } : {};
+
+    const [productos, cantidadProductos] = await Promise.all([
+      prisma.producto.findMany({
+        where,
+        skip,
+        take: limit,
+      }),
+      prisma.producto.count({ where }),
+    ]);
+
+    res.status(200).json({
+      productos,
+      paginaActual: page,
+      cantidadProductos,
+      cantPaginas: Math.ceil(cantidadProductos / limit),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al aplicar el filtro" });
+  }
+};
+
+export const buscarProducto = async (req, res) => {
+  try {
+    const { nombre } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+
+    const where = nombre
+      ? { nombre: { contains: nombre, mode: "insensitive" } }
+      : {};
+
+    const [productos, cantidadProductos] = await Promise.all([
+      prisma.producto.findMany({ where, skip, take: limit }),
+      prisma.producto.count({ where }),
+    ]);
+
+    res.status(200).json({
+      productos,
+      paginaActual: page,
+      cantidadProductos,
+      cantPaginas: Math.ceil(cantidadProductos / limit),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error al buscar productos" });
+  }
+};
