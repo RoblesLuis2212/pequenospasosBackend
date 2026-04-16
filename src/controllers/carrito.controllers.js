@@ -89,3 +89,29 @@ export const listarCarritoUsuario = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al obtener el carrito" });
   }
 };
+
+export const eliminarProductoCarrito = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const detalleExistentes = await prisma.detalleCarrito.findUnique({
+      where: { idDetalleCarrito: parseInt(id) },
+    });
+
+    if (!detalleExistentes) {
+      return res
+        .status(404)
+        .json({ mensaje: "El producto no esta en el carrito" });
+    }
+    await prisma.detalleCarrito.delete({
+      where: { idDetalleCarrito: parseInt(id) },
+    });
+
+    res.status(200).json({ mensaje: "Producto eliminado del carrito" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al eliminar el producto del carrito",
+    });
+  }
+};
