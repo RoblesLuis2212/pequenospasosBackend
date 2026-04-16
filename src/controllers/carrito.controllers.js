@@ -46,3 +46,41 @@ export const agregarAlCarrito = async (req, res) => {
       .json({ mensaje: "Ocurrio un error al agregar el producto al carrito" });
   }
 };
+
+export const listarCarritoUsuario = async (req, res) => {
+  try {
+    const usuarioId = req.usuario.idUsuario;
+
+    const carrito = await prisma.carrito.findFirst({
+      where: { usuarioId, estado: "ACTIVO" },
+      include: {
+        detalleCarritos: {
+          include: {
+            producto: {
+              select: {
+                idProducto: true,
+                nombre: true,
+                precio: true,
+                imagen: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!carrito) {
+      return res
+        .status(404)
+        .json({ mensaje: "No hay productos en el carrito" });
+    }
+    //calcular el total del carrito
+    const total = carrito.detalleCarritos.reduce((acc, detalle) => {
+      return acc + detalle.precio_unitario * detalle.cantidad;
+    }, 0);
+    res.status(200).json({ carrito, total });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al obtener el carrito" });
+  }
+};
