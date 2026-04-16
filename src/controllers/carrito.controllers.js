@@ -23,8 +23,12 @@ export const agregarAlCarrito = async (req, res) => {
     });
 
     //Si no esta en el carrito lo agregamos
-    if (!detalleExistente) {
-      //Primero se obtienen los datos del producto para poder formar el detalle
+    if (detalleExistente) {
+      await prisma.detalleCarrito.update({
+        where: { idDetalleCarrito: detalleExistente.idDetalleCarrito },
+        data: { cantidad },
+      });
+    } else {
       const producto = await prisma.producto.findUnique({
         where: { idProducto: productoId },
       });
@@ -55,6 +59,7 @@ export const listarCarritoUsuario = async (req, res) => {
       where: { usuarioId, estado: "ACTIVO" },
       include: {
         detalleCarritos: {
+          orderBy: { idDetalleCarrito: "asc" },
           include: {
             producto: {
               select: {
