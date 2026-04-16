@@ -9,6 +9,7 @@ import {
   listarProductos,
   listarProductosInicio,
   obtenerProductoID,
+  obtenerProductosDestacados,
   paginarProductos,
 } from "../controllers/productos.controllers.js";
 import validacionProductos from "../middlewares/validacionProductos.js";
@@ -33,6 +34,7 @@ router.route("/inicio").get(listarProductosInicio);
 router.route("/paginado").get(paginarProductos);
 router.route("/filtro").get(filtrarporCategoria);
 router.route("/buscar").get(buscarProducto);
+router.route("/destacados").get(obtenerProductosDestacados);
 router
   .route("/:id")
   .get(obtenerProductoID)
