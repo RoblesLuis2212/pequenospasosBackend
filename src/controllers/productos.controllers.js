@@ -239,6 +239,9 @@ export const filtrarporCategoria = async (req, res) => {
         where,
         skip,
         take: limit,
+        include: {
+          categoria: true,
+        },
       }),
       prisma.producto.count({ where }),
     ]);
@@ -267,7 +270,14 @@ export const buscarProducto = async (req, res) => {
       : {};
 
     const [productos, cantidadProductos] = await Promise.all([
-      prisma.producto.findMany({ where, skip, take: limit }),
+      prisma.producto.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          categoria: true,
+        },
+      }),
       prisma.producto.count({ where }),
     ]);
 
