@@ -279,3 +279,20 @@ export const buscarProducto = async (req, res) => {
     res.status(500).json({ mensaje: "Error al buscar productos" });
   }
 };
+export const obtenerProductosDestacados = async (req, res) => {
+  try {
+    const productosDestacados = await prisma.producto.findMany({
+      include: {
+        categoria: true,
+      },
+      take: 4,
+      orderBy: { fechaCreacion: "asc" },
+    });
+    res.status(200).json(productosDestacados);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al obtener los productos destacados",
+    });
+  }
+};

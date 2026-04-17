@@ -39,8 +39,14 @@ model Categoria {
 
 enum EstadoVenta {
   PENDIENTE
-  PAGADO
+  APROBADO
+  RETIRADO
   CANCELADO
+}
+
+enum TipoVenta {
+  PRODUCTO
+  CONSULTA
 }
 
 model Ventas {
@@ -49,12 +55,22 @@ model Ventas {
   monto       Decimal
   descripcion String?
   estado      EstadoVenta @default(PENDIENTE)
+  tipoVenta   TipoVenta
 
-  metodoPagoId Int
-  metodopago   MetodoPago @relation(fields: [metodoPagoId], references: [idMetodoPago])
+  usuarioId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [idUsuario])
 
-  cajaId Int
-  caja   Caja @relation(fields: [cajaId], references: [idCaja])
+  turnoId Int?
+  turno   Turno? @relation(fields: [turnoId], references: [idTurno])
+
+  carritoId Int?
+  carrito   Carrito? @relation(fields: [carritoId], references: [idCarrito])
+
+  metodoPagoId Int?
+  metodopago   MetodoPago? @relation(fields: [metodoPagoId], references: [idMetodoPago])
+
+  cajaId Int?
+  caja   Caja? @relation(fields: [cajaId], references: [idCaja])
 
   detalles DetalleVenta[]
 }
@@ -104,6 +120,7 @@ model Usuario {
   tokenUsuarios TokenUsuario[]
   carritos      Carrito[]
   cajas         Caja[]
+  ventas        Ventas[]
 }
 
 enum Rol {
@@ -222,7 +239,8 @@ model Turno {
 
   usuarioId Int
 
-  usuario Usuario @relation(fields: [usuarioId], references: [idUsuario])
+  usuario Usuario  @relation(fields: [usuarioId], references: [idUsuario])
+  ventas  Ventas[]
 }
 
 enum TipoMovimientoSaldo {
@@ -244,6 +262,7 @@ model SaldoPaciente {
 
 enum EstadoCarrito {
   ACTIVO
+  PENDIENTE
   COMPRADO
 }
 
@@ -254,6 +273,7 @@ model Carrito {
   usuarioId       Int
   usuario         Usuario          @relation(fields: [usuarioId], references: [idUsuario])
   detalleCarritos DetalleCarrito[]
+  ventas          Ventas[]
 }
 
 model DetalleCarrito {
