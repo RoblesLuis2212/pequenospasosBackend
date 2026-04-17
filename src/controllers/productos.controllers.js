@@ -202,6 +202,9 @@ export const paginarProductos = async (req, res) => {
 
     const [productos, cantidadProductos] = await Promise.all([
       prisma.producto.findMany({
+        include: {
+          categoria: true,
+        },
         skip: skip,
         take: limit,
       }),
