@@ -71,6 +71,9 @@ export const listarVentasPorUsuario = async (req, res) => {
           },
         },
       },
+      orderBy: {
+        fechaCompra: "asc",
+      },
     });
 
     res.status(200).json(ventaUsuario);
@@ -79,5 +82,33 @@ export const listarVentasPorUsuario = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al listar las compras del usuario" });
+  }
+};
+
+export const cancelarCompra = async (req, res) => {
+  try {
+    const compra = await prisma.ventas.findUnique({
+      where: { idVenta: Number(req.params.id) },
+    });
+
+    if (!compra) {
+      return res.status(404).json({ mensaje: "Compra no encontrada" });
+    }
+
+    const nuevoEstado =
+      compra.estado === "PENDIENTE" ? "CANCELADO" : compra.estado;
+
+    const compraActualizada = await prisma.ventas.update({
+      where: { idVenta: Number(req.params.id) },
+      data: { estado: nuevoEstado },
+    });
+
+    res.status(200).json({
+      mensaje: "Compra cancelada exitosamente",
+      compra: compraActualizada,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al cancelar la compra" });
   }
 };

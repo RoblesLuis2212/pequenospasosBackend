@@ -75,9 +75,13 @@ export const listarCarritoUsuario = async (req, res) => {
     });
 
     if (!carrito) {
-      return res
-        .status(404)
-        .json({ mensaje: "No hay productos en el carrito" });
+      return res.status(200).json({
+        carrito: {
+          idCarrito: null,
+          detalleCarritos: [],
+        },
+        total: 0,
+      });
     }
     //calcular el total del carrito
     const total = carrito.detalleCarritos.reduce((acc, detalle) => {
