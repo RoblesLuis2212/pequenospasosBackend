@@ -5,13 +5,14 @@ import {
   listarVentasPorUsuario,
 } from "../controllers/ventas.controllers.js";
 import verificarToken from "../middlewares/validarToken.js";
+import validacionID from "../middlewares/validacionID.js";
 
 const router = Router();
 
 router.route("/").get(verificarToken, listarVentasPorUsuario);
 router
   .route("/:id")
-  .post(verificarToken, finalizarCompra)
-  .patch(cancelarCompra);
+  .post(verificarToken, validacionID, finalizarCompra)
+  .patch(verificarToken, validacionID, cancelarCompra);
 
 export default router;
