@@ -13,7 +13,7 @@ export const agregarProducto = async (req, res) => {
         "https://static.vecteezy.com/system/resources/thumbnails/008/015/799/small_2x/illustration-of-no-image-available-icon-template-for-no-image-or-picture-coming-soon-free-vector.jpg";
     }
 
-    const { nombre, precio, stock, descripcion, codigoBarras, categoria } =
+    const { nombre, precio, stock, descripcion, codigoBarras, categoriaId } =
       req.body;
 
     const producto = await prisma.producto.create({
@@ -26,7 +26,7 @@ export const agregarProducto = async (req, res) => {
         imagen: imagen_url,
         categoria: {
           connect: {
-            idCategoria: Number(categoria),
+            idCategoria: Number(categoriaId),
           },
         },
       },
