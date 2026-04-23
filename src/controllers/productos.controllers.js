@@ -86,7 +86,7 @@ export const actualizarDatosProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
     });
 
-    const { nombre, precio, stock, descripcion, categoria } = req.body;
+    const { nombre, precio, stock, descripcion, categoriaId } = req.body;
 
     if (!productoBuscado) {
       return res.status(404).json({ mensaje: "Producto no encontrado" });
@@ -109,7 +109,7 @@ export const actualizarDatosProducto = async (req, res) => {
         imagen: imagen_url,
         categoria: {
           connect: {
-            idCategoria: Number(categoria),
+            idCategoria: Number(categoriaId),
           },
         },
       },
