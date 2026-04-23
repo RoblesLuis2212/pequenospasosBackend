@@ -1,7 +1,10 @@
 import { Router } from "express";
 import {
+  aprobarCompra,
   cancelarCompra,
+  cancelarCompraAdmin,
   finalizarCompra,
+  listarVentas,
   listarVentasPorUsuario,
 } from "../controllers/ventas.controllers.js";
 import verificarToken from "../middlewares/validarToken.js";
@@ -10,6 +13,11 @@ import validacionID from "../middlewares/validacionID.js";
 const router = Router();
 
 router.route("/").get(verificarToken, listarVentasPorUsuario);
+router.route("/ventas-admin").get(verificarToken, listarVentas);
+router.route("/:id/aprobar").put(verificarToken, validacionID, aprobarCompra);
+router
+  .route("/:id/cancelar-admin")
+  .patch(verificarToken, validacionID, cancelarCompraAdmin);
 router
   .route("/:id")
   .post(verificarToken, validacionID, finalizarCompra)

@@ -112,3 +112,126 @@ export const cancelarCompra = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al cancelar la compra" });
   }
 };
+
+export const listarVentas = async (req, res) => {
+  try {
+    const ventas = await prisma.ventas.findMany({
+      include: {
+        usuario: {
+          select: {
+            nombreCompleto: true,
+          },
+        },
+        detalles: {
+          include: {
+            producto: {
+              select: {
+                nombre: true,
+                precio: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        fechaCompra: "desc",
+      },
+    });
+
+    if (!ventas) {
+      return res.status(404).json({ mensaje: "No hay ventas para listar" });
+    }
+
+    res.status(200).json(ventas);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al listar las ventas" });
+  }
+};
+
+export const aprobarCompra = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.$transaction(async (tx) => {
+      const venta = await tx.ventas.findUnique({
+        where: { idVenta: Number(id) },
+        include: { detalles: true },
+      });
+
+      if (!venta) throw new Error("Venta no encontrada");
+      if (venta.estado !== "PENDIENTE")
+        throw new Error("La venta no tiene estado pendiente");
+
+      for (const detalle of venta.detalles) {
+        const producto = await tx.producto.findUnique({
+          where: { idProducto: detalle.productoId },
+        });
+
+        if (producto.stock < detalle.cantidad) {
+          throw new Error(
+            `Stock insuficiente para el producto ${producto.nombre}`,
+          );
+        }
+
+        await tx.producto.update({
+          where: { idProducto: detalle.productoId },
+          data: { stock: { decrement: detalle.cantidad } },
+        });
+      }
+
+      await tx.ventas.update({
+        where: { idVenta: Number(id) },
+        data: { estado: "APROBADO" },
+      });
+    });
+
+    res.status(200).json({ mensaje: "Compra aprobada y stock actualizado" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: err.message || "Ocurrio un error al aprobar la compra",
+    });
+  }
+};
+
+export const cancelarCompraAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.$transaction(async (tx) => {
+      const venta = await tx.ventas.findUnique({
+        where: { idVenta: Number(id) },
+        include: { detalles: true },
+      });
+
+      if (!venta) throw new Error("Venta no encontrada");
+      if (venta.estado === "CANCELADO")
+        throw new Error("La venta ya está cancelada");
+      if (venta.estado === "RETIRADO")
+        throw new Error("No se puede cancelar una venta ya retirada");
+
+      // Reponer stock solo si estaba aprobada
+      if (venta.estado === "APROBADO") {
+        await Promise.all(
+          venta.detalles.map((detalle) =>
+            tx.producto.update({
+              where: { idProducto: detalle.productoId },
+              data: { stock: { increment: detalle.cantidad } },
+            }),
+          ),
+        );
+      }
+
+      await tx.ventas.update({
+        where: { idVenta: Number(id) },
+        data: { estado: "CANCELADO" },
+      });
+    });
+
+    res.status(200).json({ mensaje: "Compra cancelada exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al cancelar la compra" });
+  }
+};
