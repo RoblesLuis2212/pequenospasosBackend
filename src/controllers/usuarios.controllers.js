@@ -333,3 +333,21 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ mensaje: "Error interno del servidor" });
   }
 };
+
+export const listarUsuariosPadres = async (req, res) => {
+  try {
+    const padres = await prisma.usuario.findMany({
+      where: {
+        rol: {
+          nombre: "PADRE",
+        },
+      },
+    });
+    res.status(200).json(padres);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al listar los usuarios con rol de padres",
+    });
+  }
+};

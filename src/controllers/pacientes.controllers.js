@@ -106,3 +106,33 @@ export const obtenerPacienteID = async (req, res) => {
       .json({ mensaje: "Ocurrio un error al obtener los datos del paciente" });
   }
 };
+
+export const asignarTutor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { usuarioId } = req.body;
+
+    const paciente = await prisma.paciente.findUnique({
+      where: { idPaciente: Number(id) },
+    });
+
+    if (!paciente) {
+      return res.status(404).json({ mensaje: "Paciente no encontrado" });
+    }
+
+    const pacienteActualizado = await prisma.paciente.update({
+      where: { idPaciente: Number(id) },
+      data: { usuarioId: Number(usuarioId) },
+    });
+
+    res.status(200).json({
+      mensaje: "Tutor asignado correctamente",
+      paciente: pacienteActualizado,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al asociar el paciente con un padre/tutor",
+    });
+  }
+};

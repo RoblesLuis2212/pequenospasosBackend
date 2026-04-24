@@ -6,6 +6,7 @@ import {
   crearUsuario,
   editarUsuario,
   listarUsuarios,
+  listarUsuariosPadres,
   login,
   obtenerUsuarioID,
   resetPassword,
@@ -26,6 +27,7 @@ router.route("/login").post(validacionLogin, login);
 router.route("/cambiar-Password").put(verificarToken, cambiarContrasena);
 router.route("/forgot-password").post(correoOlvidoPassword);
 router.route("/reset-password").post(resetPassword);
+router.route("/padres").get(verificarToken, listarUsuariosPadres);
 router
   .route("/:id")
   .patch(

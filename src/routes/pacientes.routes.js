@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   actualizarDatos,
   agregarPaciente,
+  asignarTutor,
   listarPacientes,
   obtenerPacienteID,
 } from "../controllers/pacientes.controllers.js";
@@ -14,6 +15,7 @@ router
   .route("/")
   .post(validacionPacientes, agregarPaciente)
   .get(verificarToken, listarPacientes);
+router.route("/:id/asignar-tutor").patch(verificarToken, asignarTutor);
 router
   .route("/:id")
   .put(verificarToken, validacionPacientes, actualizarDatos)
