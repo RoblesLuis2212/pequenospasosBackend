@@ -4,15 +4,13 @@ export const crearTurno = async (req, res) => {
   try {
     const { fecha, pacienteId } = req.body;
     //Leemos los datos del usuario logueado desde el token
-    const usuarioLogueado = req.usuario;
     //Se extrae su ID
-    let usuarioId = usuarioLogueado.idUsuario;
-
+    const usuarioLogueado = req.usuario;
     //Se busca al paciente
     const paciente = await prisma.paciente.findUnique({
       where: { idPaciente: Number(pacienteId) },
     });
-
+    let usuarioId;
     // Si el paciente tiene tutor, se usa usuarioId
     // Si no tiene tutor significa que el turno lo registro el admin, entonces lo dejamos null
     if (paciente?.usuarioId) {

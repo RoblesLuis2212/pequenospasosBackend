@@ -74,7 +74,10 @@ export const login = async (req, res) => {
     //verificar email
     const usuarioBuscado = await prisma.usuario.findUnique({
       where: { email },
+      include: { rol: true },
     });
+    console.log("usuario:", usuarioBuscado);
+    console.log("rol:", usuarioBuscado.rol);
 
     //verificamos que el correo exista
     if (!usuarioBuscado) {
@@ -89,19 +92,18 @@ export const login = async (req, res) => {
     if (!passwordValido) {
       return res.status(401).json({ mensaje: "Contraseña incorrecta" });
     }
-
     //generacion del token
     const token = generarJWT(
       usuarioBuscado.idUsuario,
       usuarioBuscado.email,
-      usuarioBuscado.rol,
+      usuarioBuscado.rol.nombre,
     );
     res.status(200).json({
       mensaje: "Inicio de sesion exitoso",
       usuario: {
         id: usuarioBuscado.idUsuario,
         nombre: usuarioBuscado.nombreCompleto,
-        rol: usuarioBuscado.rol,
+        rol: usuarioBuscado.rol.nombre,
       },
       token,
     });
