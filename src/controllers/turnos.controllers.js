@@ -3,27 +3,11 @@ import { prisma } from "../server/prisma.js";
 export const crearTurno = async (req, res) => {
   try {
     const { fecha, pacienteId } = req.body;
-    //Leemos los datos del usuario logueado desde el token
-    //Se extrae su ID
-    const usuarioLogueado = req.usuario;
-    //Se busca al paciente
-    const paciente = await prisma.paciente.findUnique({
-      where: { idPaciente: Number(pacienteId) },
-    });
-    let usuarioId;
-    // Si el paciente tiene tutor, se usa usuarioId
-    // Si no tiene tutor significa que el turno lo registro el admin, entonces lo dejamos null
-    if (paciente?.usuarioId) {
-      usuarioId = paciente.usuarioId;
-    } else {
-      usuarioId = null;
-    }
 
     const nuevoTurno = await prisma.turno.create({
       data: {
         fecha: new Date(fecha),
-        pacienteId,
-        usuarioId,
+        pacienteId: Number(pacienteId),
       },
     });
     res
@@ -68,7 +52,9 @@ export const obtenerInformacionTurno = async (req, res) => {
 
 export const listarTurnos = async (req, res) => {
   try {
-    const turnos = await prisma.turno.findMany();
+    const turnos = await prisma.turno.findMany({
+      include: { paciente: true },
+    });
 
     if (!turnos) {
       return res.status(404).json({ mensaje: "No hay turnos para listar" });
@@ -90,11 +76,6 @@ export const listarTurnosporUsuario = async (req, res) => {
         },
       },
       include: {
-        usuario: {
-          select: {
-            nombreCompleto: true,
-          },
-        },
         paciente: {
           include: {
             obraSocial: {

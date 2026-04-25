@@ -237,10 +237,9 @@ model Turno {
   pacienteId Int
   paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
 
-  usuarioId Int?
-
-  usuario Usuario? @relation(fields: [usuarioId], references: [idUsuario])
-  ventas  Ventas[]
+  ventas           Ventas[]
+  usuario          Usuario? @relation(fields: [usuarioIdUsuario], references: [idUsuario])
+  usuarioIdUsuario Int?
 }
 
 enum TipoMovimientoSaldo {
