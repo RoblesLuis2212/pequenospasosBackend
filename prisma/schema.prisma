@@ -287,6 +287,11 @@ model DetalleCarrito {
   producto   Producto @relation(fields: [productoId], references: [idProducto])
 }
 
+enum EstadoCaja {
+  ABIERTA
+  CERRADA
+}
+
 model Caja {
   idCaja        Int       @id @default(autoincrement())
   fechaApertura DateTime  @default(now())
@@ -294,6 +299,7 @@ model Caja {
   montoCierre   Decimal?
 
   usuarioId Int
-  usuario   Usuario  @relation(fields: [usuarioId], references: [idUsuario])
+  usuario   Usuario    @relation(fields: [usuarioId], references: [idUsuario])
   ventas    Ventas[]
+  estado    EstadoCaja @default(ABIERTA)
 }
