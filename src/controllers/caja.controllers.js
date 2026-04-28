@@ -104,3 +104,40 @@ export const listarVentas = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al listar las ventas" });
   }
 };
+
+export const registrarPagoCompraUsuario = async (req, res) => {
+  try {
+    const idVenta = Number(req.params.id);
+    const usuarioId = Number(req.usuario.idUsuario);
+
+    const compraUsuario = await prisma.ventas.findUnique({
+      where: { idVenta },
+    });
+
+    if (!compraUsuario) {
+      return res.status(404).json({ mensaje: "Compra no encontrada" });
+    }
+
+    const montoCompra = compraUsuario.monto;
+
+    const { descripcion, metodoPagoId } = req.body;
+
+    const ventaActualizada = await prisma.ventas.update({
+      where: { idVenta },
+      data: {
+        estado: "RETIRADO",
+        usuarioId,
+        monto: montoCompra,
+        descripcion: descripcion,
+        metodoPagoId,
+      },
+    });
+
+    res.status(200).json({ mensaje: "Pago registrado exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al registrar la compra del usuario" });
+  }
+};

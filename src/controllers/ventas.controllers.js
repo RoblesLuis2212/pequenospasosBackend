@@ -235,3 +235,18 @@ export const cancelarCompraAdmin = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al cancelar la compra" });
   }
 };
+
+export const agregarMetodosPago = async (req, res) => {
+  try {
+    const nuevoMetodoPago = await prisma.metodoPago.create({
+      data: req.body,
+    });
+
+    res.status(201).json({ mensaje: "Metodo de pago agregado exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al agregar el metodo de pago" });
+  }
+};

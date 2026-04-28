@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  agregarMetodosPago,
   aprobarCompra,
   cancelarCompra,
   cancelarCompraAdmin,
@@ -14,6 +15,7 @@ const router = Router();
 
 router.route("/").get(verificarToken, listarVentasPorUsuario);
 router.route("/ventas-admin").get(verificarToken, listarVentas);
+router.route("/metodos-pago").post(agregarMetodosPago);
 router.route("/:id/aprobar").put(verificarToken, validacionID, aprobarCompra);
 router
   .route("/:id/cancelar-admin")
