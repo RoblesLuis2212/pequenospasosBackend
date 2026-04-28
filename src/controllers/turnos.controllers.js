@@ -3,13 +3,11 @@ import { prisma } from "../server/prisma.js";
 export const crearTurno = async (req, res) => {
   try {
     const { fecha, pacienteId } = req.body;
-    const usuarioId = req.usuario.idUsuario;
 
     const nuevoTurno = await prisma.turno.create({
       data: {
         fecha: new Date(fecha),
-        pacienteId,
-        usuarioId,
+        pacienteId: Number(pacienteId),
       },
     });
     res
@@ -54,7 +52,9 @@ export const obtenerInformacionTurno = async (req, res) => {
 
 export const listarTurnos = async (req, res) => {
   try {
-    const turnos = await prisma.turno.findMany();
+    const turnos = await prisma.turno.findMany({
+      include: { paciente: true },
+    });
 
     if (!turnos) {
       return res.status(404).json({ mensaje: "No hay turnos para listar" });
@@ -76,11 +76,6 @@ export const listarTurnosporUsuario = async (req, res) => {
         },
       },
       include: {
-        usuario: {
-          select: {
-            nombreCompleto: true,
-          },
-        },
         paciente: {
           include: {
             obraSocial: {
@@ -116,12 +111,10 @@ export const cambiarEstadoTurno = async (req, res) => {
       data: { estado: estado },
     });
 
-    res
-      .status(200)
-      .json({
-        mensaje: "Turno actualizado correctamente",
-        turno: turnoActualizado,
-      });
+    res.status(200).json({
+      mensaje: "Turno actualizado correctamente",
+      turno: turnoActualizado,
+    });
   } catch (err) {
     console.error(err);
     res

@@ -159,8 +159,8 @@ model Paciente {
   domicilio       String
   fechaNacimiento DateTime
 
-  usuarioId          Int
-  usuario            Usuario             @relation(fields: [usuarioId], references: [idUsuario])
+  usuarioId          Int?
+  usuario            Usuario?            @relation(fields: [usuarioId], references: [idUsuario])
   fichaMedicas       FichaMedica[]
   datosEscolares     DatosEscolares[]
   obraSocialId       Int?
@@ -237,10 +237,9 @@ model Turno {
   pacienteId Int
   paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
 
-  usuarioId Int
-
-  usuario Usuario  @relation(fields: [usuarioId], references: [idUsuario])
-  ventas  Ventas[]
+  ventas           Ventas[]
+  usuario          Usuario? @relation(fields: [usuarioIdUsuario], references: [idUsuario])
+  usuarioIdUsuario Int?
 }
 
 enum TipoMovimientoSaldo {

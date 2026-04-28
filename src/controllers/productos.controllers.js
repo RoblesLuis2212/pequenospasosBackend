@@ -13,7 +13,7 @@ export const agregarProducto = async (req, res) => {
         "https://static.vecteezy.com/system/resources/thumbnails/008/015/799/small_2x/illustration-of-no-image-available-icon-template-for-no-image-or-picture-coming-soon-free-vector.jpg";
     }
 
-    const { nombre, precio, stock, descripcion, codigoBarras, categoria } =
+    const { nombre, precio, stock, descripcion, codigoBarras, categoriaId } =
       req.body;
 
     const producto = await prisma.producto.create({
@@ -26,7 +26,7 @@ export const agregarProducto = async (req, res) => {
         imagen: imagen_url,
         categoria: {
           connect: {
-            idCategoria: Number(categoria),
+            idCategoria: Number(categoriaId),
           },
         },
       },
@@ -86,7 +86,7 @@ export const actualizarDatosProducto = async (req, res) => {
       where: { idProducto: Number(req.params.id) },
     });
 
-    const { nombre, precio, stock, descripcion, categoria } = req.body;
+    const { nombre, precio, stock, descripcion, categoriaId } = req.body;
 
     if (!productoBuscado) {
       return res.status(404).json({ mensaje: "Producto no encontrado" });
@@ -109,7 +109,7 @@ export const actualizarDatosProducto = async (req, res) => {
         imagen: imagen_url,
         categoria: {
           connect: {
-            idCategoria: Number(categoria),
+            idCategoria: Number(categoriaId),
           },
         },
       },
@@ -202,6 +202,9 @@ export const paginarProductos = async (req, res) => {
 
     const [productos, cantidadProductos] = await Promise.all([
       prisma.producto.findMany({
+        include: {
+          categoria: true,
+        },
         skip: skip,
         take: limit,
       }),
@@ -236,6 +239,9 @@ export const filtrarporCategoria = async (req, res) => {
         where,
         skip,
         take: limit,
+        include: {
+          categoria: true,
+        },
       }),
       prisma.producto.count({ where }),
     ]);
@@ -264,7 +270,14 @@ export const buscarProducto = async (req, res) => {
       : {};
 
     const [productos, cantidadProductos] = await Promise.all([
-      prisma.producto.findMany({ where, skip, take: limit }),
+      prisma.producto.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          categoria: true,
+        },
+      }),
       prisma.producto.count({ where }),
     ]);
 
