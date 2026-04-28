@@ -90,25 +90,18 @@ export const regitrarPagoTurno = async (req, res) => {
   }
 };
 
-export const listarVentas = async (req, res) => {
-  try {
-    const ventas = await prisma.ventas.findMany();
-
-    if (!ventas) {
-      return res
-        .status(404)
-        .json({ mensaje: "No se encontraron ventas para listar" });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ mensaje: "Ocurrio un error al listar las ventas" });
-  }
-};
-
 export const registrarPagoCompraUsuario = async (req, res) => {
   try {
     const idVenta = Number(req.params.id);
     const usuarioId = Number(req.usuario.idUsuario);
+
+    const cajaAbierta = await prisma.caja.findFirst({
+      where: { usuarioId, estado: "ABIERTA" },
+    });
+
+    if (!cajaAbierta) {
+      return res.status(400).json({ mensaje: "No hay una caja abierta" });
+    }
 
     const compraUsuario = await prisma.ventas.findUnique({
       where: { idVenta },
@@ -130,6 +123,7 @@ export const registrarPagoCompraUsuario = async (req, res) => {
         monto: montoCompra,
         descripcion: descripcion,
         metodoPagoId,
+        cajaId: cajaAbierta.idCaja,
       },
     });
 
@@ -139,5 +133,42 @@ export const registrarPagoCompraUsuario = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al registrar la compra del usuario" });
+  }
+};
+
+export const cerrarCaja = async (req, res) => {
+  try {
+    const usuarioId = req.usuario.idUsuario;
+    //Primero se verifica si hay una caja abierta
+    const cajaAbierta = await prisma.caja.findFirst({
+      where: { usuarioId, estado: "ABIERTA" },
+      include: { ventas: true },
+    });
+
+    if (!cajaAbierta) {
+      return res.status(400).json({ mensaje: "No hay caja abierta" });
+    }
+
+    console.log(cajaAbierta);
+
+    const montoCierre = cajaAbierta.ventas
+      .filter((v) => v.estado === "RETIRADO")
+      .reduce((acc, v) => acc + Number(v.monto), 0);
+
+    const cajaCerrada = await prisma.caja.update({
+      where: { idCaja: cajaAbierta.idCaja },
+      data: {
+        fechaCierre: new Date(),
+        montoCierre,
+        estado: "CERRADA",
+      },
+    });
+
+    res
+      .status(200)
+      .json({ mensaje: "Caja cerrada correctamente. ", caja: cajaCerrada });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al cerrar la caja" });
   }
 };
