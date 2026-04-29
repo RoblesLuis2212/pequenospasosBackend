@@ -42,6 +42,7 @@ enum EstadoVenta {
   APROBADO
   RETIRADO
   CANCELADO
+  PAGADO
 }
 
 enum TipoVenta {

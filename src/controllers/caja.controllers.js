@@ -152,7 +152,7 @@ export const cerrarCaja = async (req, res) => {
     console.log(cajaAbierta);
 
     const montoCierre = cajaAbierta.ventas
-      .filter((v) => v.estado === "RETIRADO")
+      .filter((v) => v.estado === "APROBADO" || v.estado === "RETIRADO")
       .reduce((acc, v) => acc + Number(v.monto), 0);
 
     const cajaCerrada = await prisma.caja.update({
@@ -170,5 +170,64 @@ export const cerrarCaja = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: "Ocurrio un error al cerrar la caja" });
+  }
+};
+
+export const obtenerCajaActiva = async (req, res) => {
+  try {
+    const usuarioId = req.usuario.idUsuario;
+
+    const cajaActiva = await prisma.caja.findFirst({
+      where: { usuarioId, estado: "ABIERTA" },
+      include: {
+        ventas: {
+          orderBy: { fechaCompra: "desc" },
+          include: {
+            metodopago: true,
+            usuario: {
+              select: {
+                nombreCompleto: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!cajaActiva) {
+      return res.status(404).json({ mensaje: "No hay caja abierta" });
+    }
+
+    // Total recaudado tanto de consultas pagadas como de productos retirados
+    const totalRecaudado = cajaActiva.ventas
+      .filter((v) => v.estado === "RETIRADO" || v.estado === "PAGADO")
+      .map((v) => Number(v.monto.toString()))
+      .reduce((acc, monto) => acc + monto, 0);
+
+    //Cantidad de ventas
+    const cantidadVentas = cajaActiva.ventas.filter(
+      (v) => v.estado === "RETIRADO" || v.estado === "PAGADO",
+    ).length;
+
+    //Por metodo de pago
+    const porMetodoPago = cajaActiva.ventas
+      .filter((v) => v.estado === "RETIRADO" || v.estado === "PAGADO")
+      .reduce((acc, v) => {
+        const metodo = v.metodopago?.nombre || "SIN_METODO";
+        acc[metodo] = (acc[metodo] || 0) + Number(v.monto.toString());
+        return acc;
+      }, {});
+
+    res.status(200).json({
+      caja: cajaActiva,
+      metricas: {
+        totalRecaudado,
+        cantidadVentas,
+        porMetodoPago,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Error al obtener los datos de la caja" });
   }
 };
