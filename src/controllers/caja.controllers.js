@@ -209,6 +209,21 @@ export const obtenerCajaActiva = async (req, res) => {
       (v) => v.estado === "RETIRADO" || v.estado === "PAGADO",
     ).length;
 
+    const cantidadVentasTransferencia = cajaActiva.ventas.filter(
+      (v) => v.metodopago.nombre === "TRANSFERENCIA",
+    ).length;
+
+    const cantidadVentasEfectivo = cajaActiva.ventas.filter(
+      (v) => v.metodopago.nombre === "EFECTIVO",
+    ).length;
+
+    const cantidadVentasCredito = cajaActiva.ventas.filter(
+      (v) => v.metodopago.nombre === "CREDITO",
+    ).length;
+
+    const cantidadVentasDebito = cajaActiva.ventas.filter(
+      (v) => v.metodopago.nombre === "DEBITO",
+    ).length;
     //Por metodo de pago
     const porMetodoPago = cajaActiva.ventas
       .filter((v) => v.estado === "RETIRADO" || v.estado === "PAGADO")
@@ -223,6 +238,10 @@ export const obtenerCajaActiva = async (req, res) => {
       metricas: {
         totalRecaudado,
         cantidadVentas,
+        cantidadVentasTransferencia,
+        cantidadVentasEfectivo,
+        cantidadVentasDebito,
+        cantidadVentasCredito,
         porMetodoPago,
       },
     });
