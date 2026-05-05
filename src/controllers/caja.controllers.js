@@ -113,7 +113,9 @@ export const registrarPagoCompraUsuario = async (req, res) => {
 
     const montoCompra = compraUsuario.monto;
 
-    const { descripcion, metodoPagoId } = req.body;
+    const { descripcion, metodoPagoId, pagoCon } = req.body;
+
+    const vuelto = Number(pagoCon) - Number(montoCompra);
 
     const ventaActualizada = await prisma.ventas.update({
       where: { idVenta },
@@ -124,6 +126,8 @@ export const registrarPagoCompraUsuario = async (req, res) => {
         descripcion: descripcion,
         metodoPagoId,
         cajaId: cajaAbierta.idCaja,
+        pagoCon,
+        vuelto,
       },
     });
 
