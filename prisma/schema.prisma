@@ -53,6 +53,7 @@ enum TipoVenta {
 model Ventas {
   idVenta     Int         @id @default(autoincrement())
   fechaCompra DateTime    @default(now())
+  fechaRetiro DateTime?
   monto       Decimal
   pagoCon     Decimal?
   vuelto      Decimal?

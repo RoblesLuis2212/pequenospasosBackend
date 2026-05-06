@@ -128,6 +128,7 @@ export const registrarPagoCompraUsuario = async (req, res) => {
         cajaId: cajaAbierta.idCaja,
         pagoCon,
         vuelto,
+        fechaRetiro: new Date(),
       },
     });
 
@@ -152,8 +153,6 @@ export const cerrarCaja = async (req, res) => {
     if (!cajaAbierta) {
       return res.status(400).json({ mensaje: "No hay caja abierta" });
     }
-
-    console.log(cajaAbierta);
 
     const montoCierre = cajaAbierta.ventas
       .filter((v) => v.estado === "APROBADO" || v.estado === "RETIRADO")
