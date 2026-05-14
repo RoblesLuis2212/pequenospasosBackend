@@ -56,6 +56,8 @@ export const regitrarPagoTurno = async (req, res) => {
     }
 
     const precioConsulta = turno.paciente.obraSocial?.precioConsulta || 25000;
+    const { metodopagoId, pagoCon } = req.body;
+    const vuelto = pagoCon - precioConsulta;
 
     const ventaExistente = await prisma.ventas.findFirst({
       where: { turnoId: Number(req.params.id) },
@@ -71,8 +73,11 @@ export const regitrarPagoTurno = async (req, res) => {
         tipoVenta: "CONSULTA",
         estado: "APROBADO",
         usuarioId,
+        pagoCon,
+        vuelto,
         turnoId: Number(req.params.id),
         cajaId: cajaAbierta.idCaja,
+        metodoPagoId: Number(req.body.metodoPagoId),
       },
     });
 
@@ -203,13 +208,21 @@ export const obtenerCajaActiva = async (req, res) => {
 
     // Total recaudado tanto de consultas pagadas como de productos retirados
     const totalRecaudado = cajaActiva.ventas
-      .filter((v) => v.estado === "RETIRADO" || v.estado === "PAGADO")
+      .filter(
+        (v) =>
+          v.estado === "RETIRADO" ||
+          v.estado === "PAGADO" ||
+          v.estado === "APROBADO",
+      )
       .map((v) => Number(v.monto.toString()))
       .reduce((acc, monto) => acc + monto, 0);
 
     //Cantidad de ventas
     const cantidadVentas = cajaActiva.ventas.filter(
-      (v) => v.estado === "RETIRADO" || v.estado === "PAGADO",
+      (v) =>
+        v.estado === "RETIRADO" ||
+        v.estado === "PAGADO" ||
+        v.estado === "APROBADO",
     ).length;
 
     const cantidadVentasTransferencia = cajaActiva.ventas.filter(
@@ -229,7 +242,12 @@ export const obtenerCajaActiva = async (req, res) => {
     ).length;
     //Por metodo de pago
     const porMetodoPago = cajaActiva.ventas
-      .filter((v) => v.estado === "RETIRADO" || v.estado === "PAGADO")
+      .filter(
+        (v) =>
+          v.estado === "RETIRADO" ||
+          v.estado === "PAGADO" ||
+          v.estado === "APROBADO",
+      )
       .reduce((acc, v) => {
         const metodo = v.metodopago?.nombre || "SIN_METODO";
         acc[metodo] = (acc[metodo] || 0) + Number(v.monto.toString());

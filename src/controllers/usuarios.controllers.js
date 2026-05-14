@@ -76,8 +76,6 @@ export const login = async (req, res) => {
       where: { email },
       include: { rol: true },
     });
-    console.log("usuario:", usuarioBuscado);
-    console.log("rol:", usuarioBuscado.rol);
 
     //verificamos que el correo exista
     if (!usuarioBuscado) {
