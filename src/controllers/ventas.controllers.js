@@ -235,3 +235,57 @@ export const cancelarCompraAdmin = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al cancelar la compra" });
   }
 };
+
+export const agregarMetodosPago = async (req, res) => {
+  try {
+    const nuevoMetodoPago = await prisma.metodoPago.create({
+      data: req.body,
+    });
+
+    res.status(201).json({ mensaje: "Metodo de pago agregado exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al agregar el metodo de pago" });
+  }
+};
+
+export const historialVentasTotales = async (req, res) => {
+  try {
+    const ventas = await prisma.ventas.findMany({
+      where: {
+        estado: {
+          in: ["APROBADO", "PAGADO", "RETIRADO"],
+        },
+      },
+      include: {
+        usuario: {
+          select: {
+            nombreCompleto: true,
+          },
+        },
+        metodopago: true,
+        turno: {
+          include: {
+            paciente: {
+              include: {
+                usuario: {
+                  select: {
+                    nombreCompleto: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    res.status(200).json(ventas);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al obtener el historial de ventas totales",
+    });
+  }
+};

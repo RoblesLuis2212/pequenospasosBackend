@@ -42,6 +42,7 @@ enum EstadoVenta {
   APROBADO
   RETIRADO
   CANCELADO
+  PAGADO
 }
 
 enum TipoVenta {
@@ -52,7 +53,10 @@ enum TipoVenta {
 model Ventas {
   idVenta     Int         @id @default(autoincrement())
   fechaCompra DateTime    @default(now())
+  fechaRetiro DateTime?
   monto       Decimal
+  pagoCon     Decimal?
+  vuelto      Decimal?
   descripcion String?
   estado      EstadoVenta @default(PENDIENTE)
   tipoVenta   TipoVenta
@@ -287,6 +291,11 @@ model DetalleCarrito {
   producto   Producto @relation(fields: [productoId], references: [idProducto])
 }
 
+enum EstadoCaja {
+  ABIERTA
+  CERRADA
+}
+
 model Caja {
   idCaja        Int       @id @default(autoincrement())
   fechaApertura DateTime  @default(now())
@@ -294,6 +303,7 @@ model Caja {
   montoCierre   Decimal?
 
   usuarioId Int
-  usuario   Usuario  @relation(fields: [usuarioId], references: [idUsuario])
+  usuario   Usuario    @relation(fields: [usuarioId], references: [idUsuario])
   ventas    Ventas[]
+  estado    EstadoCaja @default(ABIERTA)
 }
