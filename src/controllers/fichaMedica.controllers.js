@@ -40,7 +40,7 @@ export const obtenerFichaPaciente = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const fichaPaciente = await prisma.fichaMedica.findFirst({
+    const fichaPaciente = await prisma.fichaMedica.findUnique({
       where: { pacienteId: Number(id) },
     });
 
@@ -55,6 +55,52 @@ export const obtenerFichaPaciente = async (req, res) => {
     console.error(err);
     res.status(500).json({
       mensaje: "Ocurrio un error al obtener la ficha medica del paciente",
+    });
+  }
+};
+
+export const editarFichaMedicaPaciente = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const fichaPaciente = await prisma.fichaMedica.findUnique({
+      where: { pacienteId: Number(id) },
+    });
+
+    if (!fichaPaciente) {
+      return res
+        .status(404)
+        .json({ mensaje: "El paciente no posee una ficha medica" });
+    }
+
+    const {
+      edad_camino,
+      socializacion,
+      derivacion,
+      horarios_sueño,
+      contacto_visual,
+      actividades,
+    } = req.body;
+
+    const fichaActualizada = await prisma.fichaMedica.update({
+      where: { pacienteId: Number(id) },
+      data: {
+        edad_camino,
+        socializacion,
+        derivacion,
+        horarios_sueño,
+        contacto_visual,
+        actividades,
+      },
+    });
+
+    res
+      .status(200)
+      .json({ mensaje: "Ficha medica del paciente actualizada correctamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al editar la ficha medica del paciente",
     });
   }
 };
