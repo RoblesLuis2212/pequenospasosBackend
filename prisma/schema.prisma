@@ -183,7 +183,7 @@ model FichaMedica {
   contacto_visual String?
   actividades     String?
 
-  pacienteId Int
+  pacienteId Int      @unique
   paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
 }
 

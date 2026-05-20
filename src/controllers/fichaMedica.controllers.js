@@ -1,10 +1,11 @@
+import { response } from "express";
 import { prisma } from "../server/prisma.js";
 
 export const crearFichaPaciente = async (req, res) => {
   try {
-    const { pacienteId } = req.params;
+    const { id } = req.params;
     const {
-      edadCamino,
+      edad_camino,
       socializacion,
       derivacion,
       horarios_sueño,
@@ -20,7 +21,7 @@ export const crearFichaPaciente = async (req, res) => {
         horarios_sueño,
         contacto_visual,
         actividades,
-        pacienteId: Number(pacienteId),
+        pacienteId: Number(id),
       },
     });
 
@@ -31,6 +32,29 @@ export const crearFichaPaciente = async (req, res) => {
     console.error(err);
     res.status(500).json({
       mensaje: "Ocurrio un error al crear la ficha medica del paciente",
+    });
+  }
+};
+
+export const obtenerFichaPaciente = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const fichaPaciente = await prisma.fichaMedica.findFirst({
+      where: { pacienteId: Number(id) },
+    });
+
+    if (!fichaPaciente) {
+      return res
+        .status(404)
+        .json({ mensaje: "El paciente no posee ficha medica" });
+    }
+
+    res.status(200).json(fichaPaciente);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al obtener la ficha medica del paciente",
     });
   }
 };
