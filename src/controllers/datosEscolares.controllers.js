@@ -30,3 +30,24 @@ export const agregarDatosEscolares = async (req, res) => {
     });
   }
 };
+
+export const listarDatosEscolaresPaciente = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const datosPaciente = await prisma.datosEscolares.findUnique({
+      where: { pacienteIdPaciente: Number(id) },
+    });
+
+    if (!datosPaciente) {
+      return res.status(404).json({ mensaje: "Paciente no encontrado" });
+    }
+
+    res.status(200).json(datosPaciente);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al listar los datos escolares del paciente",
+    });
+  }
+};
