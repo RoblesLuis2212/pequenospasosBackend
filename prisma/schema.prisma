@@ -199,7 +199,7 @@ model DatosEscolares {
   turno            TurnoCursado
 
   paciente           Paciente @relation(fields: [pacienteIdPaciente], references: [idPaciente])
-  pacienteIdPaciente Int
+  pacienteIdPaciente Int      @unique
 }
 
 enum estadoObraSocial {

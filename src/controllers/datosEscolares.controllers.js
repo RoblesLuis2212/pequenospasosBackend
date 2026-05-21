@@ -3,10 +3,21 @@ import { prisma } from "../server/prisma.js";
 export const agregarDatosEscolares = async (req, res) => {
   try {
     const { escuela, turno } = req.body;
+    const { id } = req.params;
+
+    const paciente = await prisma.paciente.findUnique({
+      where: { idPaciente: Number(id) },
+    });
+
+    if (!paciente) {
+      return res.status(404).json({ mensaje: "Paciente no encontrado" });
+    }
+
     const datosEscolares = await prisma.datosEscolares.create({
       data: {
         escuela,
         turno,
+        pacienteIdPaciente: Number(id),
       },
     });
     res
