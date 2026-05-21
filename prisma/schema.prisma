@@ -179,7 +179,7 @@ model FichaMedica {
   edad_camino     String?
   socializacion   String?
   derivacion      String?
-  horarios_sueño String?
+  horarios_sueno  String?
   contacto_visual String?
   actividades     String?
 
