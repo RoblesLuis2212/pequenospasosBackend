@@ -28,7 +28,16 @@ export const agregarPaciente = async (req, res) => {
 export const listarPacientes = async (req, res) => {
   try {
     const pacientes = await prisma.paciente.findMany({
-      include: { obraSocial: true, usuario: true },
+      include: {
+        obraSocial: true,
+        usuario: true,
+        datosEscolares: {
+          select: {
+            escuela: true,
+            turno: true,
+          },
+        },
+      },
     });
 
     res.status(200).json(pacientes);
