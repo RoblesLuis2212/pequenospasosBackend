@@ -222,7 +222,7 @@ model EvolucionPaciente {
   descripcion String
   fecha       DateTime @default(now())
 
-  pacienteId Int      @unique
+  pacienteId Int
   paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
 }
 
