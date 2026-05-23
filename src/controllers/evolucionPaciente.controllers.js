@@ -52,3 +52,36 @@ export const listarEvolucionPaciente = async (req, res) => {
     });
   }
 };
+
+export const editarEvolucionPaciente = async (req, res) => {
+  try {
+    const { descripcion } = req.body;
+    const { id } = req.params;
+
+    const evolucionPaciente = await prisma.evolucionPaciente.findUnique({
+      where: { idEvolucion: Number(id) },
+    });
+
+    if (!evolucionPaciente) {
+      return res
+        .status(404)
+        .json({ mensaje: "La evolucion registrada del paciente no existe" });
+    }
+
+    const evolucionActualizada = await prisma.evolucionPaciente.update({
+      where: { idEvolucion: Number(id) },
+      data: {
+        descripcion,
+      },
+    });
+
+    res
+      .status(200)
+      .json({ mensaje: "Evolucion del paciente actualizada exitosamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      mensaje: "Ocurrio un error al editar la evolucion del paciente",
+    });
+  }
+};
