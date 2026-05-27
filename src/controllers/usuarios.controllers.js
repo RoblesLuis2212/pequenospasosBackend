@@ -349,3 +349,25 @@ export const listarUsuariosPadres = async (req, res) => {
     });
   }
 };
+
+export const enviarConsultaCorreo = async (req, res) => {
+  try {
+    const { nombre, email, mensaje } = req.body;
+
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: "luisgeremiasrobles@gmail.com",
+      subject: "Nueva consulta de un paciente",
+      html: `
+                <h3>Nuevo mensaje de contacto</h3>
+                <p><strong>Nombre:</strong> ${nombre}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Mensaje:</strong> ${mensaje}</p>
+            `,
+    });
+    res.status(200).json({ mensaje: "Consulta enviada correctamente" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al enviar el correo" });
+  }
+};
