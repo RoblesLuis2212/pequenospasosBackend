@@ -6,12 +6,13 @@ import {
 } from "../controllers/evolucionPaciente.controllers.js";
 import { editarDatosEscolares } from "../controllers/datosEscolares.controllers.js";
 import verificarToken from "../middlewares/validarToken.js";
+import validacionID from "../middlewares/validacionID.js";
 
 const router = Router();
 router
   .route("/:id")
-  .post(verificarToken, agregarEvolucion)
-  .get(verificarToken, listarEvolucionPaciente)
-  .put(verificarToken, editarEvolucionPaciente);
+  .post(verificarToken, validacionID, agregarEvolucion)
+  .get(verificarToken, validacionID, listarEvolucionPaciente)
+  .put(verificarToken, validacionID, editarEvolucionPaciente);
 
 export default router;
