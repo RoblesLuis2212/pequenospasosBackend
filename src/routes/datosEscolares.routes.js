@@ -7,12 +7,14 @@ import {
 import verificarToken from "../middlewares/validarToken.js";
 import validacionID from "../middlewares/validacionID.js";
 import validacionDatosEscolares from "../middlewares/validacionDatosEscolares.js";
+import { verificarRol } from "../middlewares/verificarRol.js";
 
 const router = Router();
 router
   .route("/:id")
   .post(
     verificarToken,
+    verificarRol,
     validacionID,
     validacionDatosEscolares,
     agregarDatosEscolares,
@@ -20,6 +22,7 @@ router
   .get(verificarToken, validacionID, listarDatosEscolaresPaciente)
   .put(
     verificarToken,
+    verificarRol,
     validacionID,
     validacionDatosEscolares,
     editarDatosEscolares,

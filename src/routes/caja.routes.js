@@ -8,18 +8,21 @@ import {
 } from "../controllers/caja.controllers.js";
 import verificarToken from "../middlewares/validarToken.js";
 import validacionID from "../middlewares/validacionID.js";
+import { verificarRol } from "../middlewares/verificarRol.js";
 
 const router = Router();
 router
   .route("/")
-  .post(verificarToken, abrirCaja)
-  .get(verificarToken, obtenerCajaActiva);
-router.route("/:id/cierre").patch(verificarToken, validacionID, cerrarCaja);
+  .post(verificarToken, verificarRol, abrirCaja)
+  .get(verificarToken, verificarRol, obtenerCajaActiva);
+router
+  .route("/:id/cierre")
+  .patch(verificarToken, verificarRol, validacionID, cerrarCaja);
 router
   .route("/:id/turno-pago")
-  .put(verificarToken, validacionID, regitrarPagoTurno);
+  .put(verificarToken, validacionID, verificarRol, regitrarPagoTurno);
 router
   .route("/:id/compra-pago")
-  .put(verificarToken, registrarPagoCompraUsuario);
+  .put(verificarToken, verificarRol, registrarPagoCompraUsuario);
 
 export default router;

@@ -18,12 +18,14 @@ import validacionEstadoProducto from "../middlewares/ValidacionEstadoProducto.js
 import errorMulter from "../middlewares/ErrorMulter.js";
 import upload from "../helpers/upload.js";
 import validacionID from "../middlewares/validacionID.js";
+import { verificarRol } from "../middlewares/verificarRol.js";
 
 const router = Router();
 router
   .route("/")
   .post(
     verificarToken,
+    verificarRol,
     upload.single("imagen"),
     errorMulter,
     validacionProductos,
@@ -40,13 +42,19 @@ router
   .get(obtenerProductoID)
   .put(
     verificarToken,
+    verificarRol,
     validacionID,
     upload.single("imagen"),
     errorMulter,
     validacionProductos,
     actualizarDatosProducto,
   )
-  .patch(verificarToken, validacionEstadoProducto, cambiarEstadoProducto);
+  .patch(
+    verificarToken,
+    verificarRol,
+    validacionEstadoProducto,
+    cambiarEstadoProducto,
+  );
 router.route("/categorias").post(agregarCategoriaProducto);
 
 export default router;
