@@ -171,7 +171,6 @@ model Paciente {
   obraSocial         ObraSocial?         @relation(fields: [obraSocialId], references: [idObraSocial])
   evolucionPacientes EvolucionPaciente[]
   turnos             Turno[]
-  saldoPacientes     SaldoPaciente[]
 }
 
 model FichaMedica {
@@ -244,23 +243,6 @@ model Turno {
   ventas           Ventas[]
   usuario          Usuario? @relation(fields: [usuarioIdUsuario], references: [idUsuario])
   usuarioIdUsuario Int?
-}
-
-enum TipoMovimientoSaldo {
-  INGRESO
-  CONSUMO
-  AJUSTE
-}
-
-model SaldoPaciente {
-  idSaldo     Int                 @id @default(autoincrement())
-  cantidad    Decimal
-  tipo        TipoMovimientoSaldo
-  descripcion String?
-  fecha       DateTime            @default(now())
-
-  pacienteId Int
-  paciente   Paciente @relation(fields: [pacienteId], references: [idPaciente])
 }
 
 enum EstadoCarrito {
