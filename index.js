@@ -1,8 +1,8 @@
 import Server from "./src/server/config.js";
 import router from "./src/routes/index.routes.js";
-import { verificarAdmin } from "./src/helpers/verificarAdmin.js";
+import { ejecutarSeeds } from "./src/seeds/seeds.js";
 
-await verificarAdmin();
+await ejecutarSeeds();
 const server = new Server();
 server.app.use("/api", router);
 
