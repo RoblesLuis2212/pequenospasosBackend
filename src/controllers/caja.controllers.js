@@ -126,6 +126,12 @@ export const registrarPagoCompraUsuario = async (req, res) => {
 
     const { descripcion, metodoPagoId, pagoCon } = req.body;
 
+    if (pagoCon < montoCompra) {
+      return res.status(400).json({
+        mensaje: "El monto recibido no puede ser menor al precio de la compra",
+      });
+    }
+
     const vuelto = Number(pagoCon) - Number(montoCompra);
 
     const ventaActualizada = await prisma.ventas.update({
