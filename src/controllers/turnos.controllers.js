@@ -53,7 +53,17 @@ export const obtenerInformacionTurno = async (req, res) => {
 export const listarTurnos = async (req, res) => {
   try {
     const turnos = await prisma.turno.findMany({
-      include: { paciente: true },
+      include: {
+        paciente: {
+          include: {
+            obraSocial: {
+              select: {
+                precioConsulta: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!turnos) {
