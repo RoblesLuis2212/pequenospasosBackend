@@ -14,7 +14,7 @@ const validacionDatosEscolares = [
   body("turno")
     .notEmpty()
     .withMessage("El turno en que asiste el paciente es un dato obligatorio")
-    .isIn(["MAÑANA", "TARDE", "NOCHE"])
+    .isIn(["MANANA", "TARDE", "NOCHE"])
     .withMessage("Turno no valido"),
   (req, res, next) => resultadoValidacion(req, res, next),
 ];

@@ -57,6 +57,12 @@ export const regitrarPagoTurno = async (req, res) => {
 
     const precioConsulta = turno.paciente.obraSocial?.precioConsulta || 25000;
     const { metodopagoId, pagoCon } = req.body;
+    if (pagoCon < precioConsulta) {
+      return res.status(400).json({
+        mensaje:
+          "El monto recibido no puede ser menor al precio de la consulta",
+      });
+    }
     const vuelto = pagoCon - precioConsulta;
 
     const ventaExistente = await prisma.ventas.findFirst({
