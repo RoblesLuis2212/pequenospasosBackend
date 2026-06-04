@@ -152,7 +152,6 @@ export const listarVentas = async (req, res) => {
 export const aprobarCompra = async (req, res) => {
   try {
     const { id } = req.params;
-
     await prisma.$transaction(async (tx) => {
       const venta = await tx.ventas.findUnique({
         where: { idVenta: Number(id) },
@@ -178,6 +177,17 @@ export const aprobarCompra = async (req, res) => {
           where: { idProducto: detalle.productoId },
           data: { stock: { decrement: detalle.cantidad } },
         });
+
+        const productoActualizado = await tx.producto.findUnique({
+          where: { idProducto: detalle.productoId },
+        });
+
+        if (productoActualizado.stock === 0) {
+          await tx.producto.update({
+            where: { idProducto: detalle.productoId },
+            data: { estado: "INACTIVO" },
+          });
+        }
       }
 
       await tx.ventas.update({
