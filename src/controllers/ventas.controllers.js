@@ -96,7 +96,9 @@ export const cancelarCompra = async (req, res) => {
     }
 
     const nuevoEstado =
-      compra.estado === "PENDIENTE" ? "CANCELADO" : compra.estado;
+      compra.estado === "PENDIENTE" || compra.estado === "APROBADO"
+        ? "CANCELADO"
+        : compra.estado;
 
     const compraActualizada = await prisma.ventas.update({
       where: { idVenta: Number(req.params.id) },
