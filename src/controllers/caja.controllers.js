@@ -138,7 +138,7 @@ export const registrarPagoCompraUsuario = async (req, res) => {
       where: { idVenta },
       data: {
         estado: "RETIRADO",
-        usuarioId,
+        // usuarioId,
         monto: montoCompra,
         descripcion: descripcion,
         metodoPagoId,
