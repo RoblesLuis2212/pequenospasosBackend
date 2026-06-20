@@ -138,7 +138,7 @@ export const registrarPagoCompraUsuario = async (req, res) => {
       where: { idVenta },
       data: {
         estado: "RETIRADO",
-        usuarioId,
+        // usuarioId,
         monto: montoCompra,
         descripcion: descripcion,
         metodoPagoId,
@@ -207,6 +207,17 @@ export const obtenerCajaActiva = async (req, res) => {
             usuario: {
               select: {
                 nombreCompleto: true,
+              },
+            },
+            turno: {
+              include: {
+                paciente: {
+                  include: {
+                    usuario: {
+                      select: { nombreCompleto: true },
+                    },
+                  },
+                },
               },
             },
           },
