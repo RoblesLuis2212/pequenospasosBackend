@@ -209,6 +209,17 @@ export const obtenerCajaActiva = async (req, res) => {
                 nombreCompleto: true,
               },
             },
+            turno: {
+              include: {
+                paciente: {
+                  include: {
+                    usuario: {
+                      select: { nombreCompleto: true },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
