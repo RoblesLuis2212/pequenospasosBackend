@@ -200,15 +200,20 @@ export const paginarProductos = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    const where = {
+      estado: "DISPONIBLE",
+    };
+
     const [productos, cantidadProductos] = await Promise.all([
       prisma.producto.findMany({
+        where,
         include: {
           categoria: true,
         },
         skip: skip,
         take: limit,
       }),
-      prisma.producto.count(),
+      prisma.producto.count({ where }),
     ]);
 
     res.status(200).json({
